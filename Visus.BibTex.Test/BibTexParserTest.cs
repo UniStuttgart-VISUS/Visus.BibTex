@@ -18,7 +18,7 @@ namespace Visus.BibTex.Test {
 
         [TestMethod]
         public void TestSingle() {
-            var bibtex = "@article{hugo, title={bla}}";
+            var bibtex = "@article{hugo, year=2024}";
             var items = BibTexParser<BibItem>.Parse(new StringReader(bibtex));
             items.ToList();
         }

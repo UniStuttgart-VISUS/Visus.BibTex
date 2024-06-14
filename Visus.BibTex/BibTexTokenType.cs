@@ -18,6 +18,11 @@ namespace Visus.BibTex {
         At,
 
         /// <summary>
+        /// The \ escape character.
+        /// </summary>
+        Backslash,
+
+        /// <summary>
         /// A left brace signifying the body of the entry or a string literal.
         /// </summary>
         BraceLeft,

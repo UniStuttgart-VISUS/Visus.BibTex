@@ -17,11 +17,11 @@ namespace Visus.BibTex {
     public static class BibTexParser<TBibItem> where TBibItem : new() {
 
         public static IEnumerable<TBibItem> Parse(TextReader reader) {
-            using var lexer = new BibTexLexer(reader);
             var state = State.List;
             var sb = new StringBuilder();
 
-            foreach (var l in lexer.Tokenise()) {
+            foreach (var l in BibTexLexer.Tokenise(reader)) {
+
                 if (!Transitions.TryGetValue((state, l.Type), out var xi)) {
                     throw new FormatException("TODO");
                 }
@@ -101,7 +101,8 @@ namespace Visus.BibTex {
             FieldHead,
             FieldQuoted,
             FieldBraced,
-            EndEntry,
+            FieldNumber,
+            FieldTail,
 
             CommentLine
         }
@@ -140,11 +141,13 @@ namespace Visus.BibTex {
 
                 // The entry type starts at the first letter after the @.
                 { (State.EntryStart, BibTexTokenType.WhiteSpace), State.EntryStart },
+
                 { (State.EntryStart, BibTexTokenType.Letter), (State.EntryType, true) },
 
                 // The entry type is only comprised of letters. If we reach {,
                 // we are in the entry and accumulate the key.
                 { (State.EntryType, BibTexTokenType.Letter), (State.EntryType, true) },
+
                 { (State.EntryType, BibTexTokenType.WhiteSpace), State.EntryTypeTail },
                 { (State.EntryType, BibTexTokenType.BraceLeft), State.EntryKey },
 
@@ -155,6 +158,7 @@ namespace Visus.BibTex {
                 // We accept almost anything for the key, but as for the entry
                 // type, we bail out after the first white space.
                 { (State.EntryKey, BibTexTokenType.At), (State.EntryKey, true) },
+                { (State.EntryKey, BibTexTokenType.Backslash), (State.EntryKey, true) },
                 { (State.EntryKey, BibTexTokenType.Character), (State.EntryKey, true) },
                 { (State.EntryKey, BibTexTokenType.Digit), (State.EntryKey, true) },
                 { (State.EntryKey, BibTexTokenType.Equals), (State.EntryKey, true) },
@@ -186,6 +190,20 @@ namespace Visus.BibTex {
                 // Eat white spaces after the name of the field.
                 { (State.FieldNameTail, BibTexTokenType.WhiteSpace), State.FieldHead },
                 { (State.FieldNameTail, BibTexTokenType.Equals), State.FieldHead },
+
+                // The first non-space character after the equal sign determines
+                // the type of the field, either two types of strings or a
+                // number literal.
+                { (State.FieldHead, BibTexTokenType.BraceLeft), State.FieldBraced },
+                { (State.FieldHead, BibTexTokenType.Quote), State.FieldQuoted},
+                { (State.FieldHead, BibTexTokenType.Digit), (State.FieldNumber, true) },
+
+
+
+                { (State.FieldNumber, BibTexTokenType.Digit), (State.FieldNumber, true) },
+                { (State.FieldNumber, BibTexTokenType.WhiteSpace), State.FieldTail },
+                { (State.FieldNumber, BibTexTokenType.Comma), State.FieldNameHead },
+                { (State.FieldNumber, BibTexTokenType.BraceRight), State.List },
             };
     }
 }

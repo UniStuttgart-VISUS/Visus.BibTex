@@ -14,36 +14,25 @@ namespace Visus.BibTex {
     /// <summary>
     /// Lexer for BibTex tokens.
     /// </summary>
-    internal sealed class BibTexLexer : IDisposable {
-
-        /// <summary>
-        /// Initialises a new instance parsing the given text.
-        /// </summary>
-        /// <param name="reader">A reader of the BibTex text.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="reader"/>
-        /// is <c>null</c>.</exception>
-        public BibTexLexer(TextReader reader) {
-            this._reader = reader
-                ?? throw new ArgumentNullException(nameof(reader));
-        }
-
-        /// <summary>
-        /// Disposes the underlying <see cref="StreamReader"/>.
-        /// </summary>
-        public void Dispose() => this._reader.Dispose();
+    internal static class BibTexLexer {
 
         /// <summary>
         /// Scan the input and return the tokens it comprises of.
         /// </summary>
+        /// <param name="reader">The reader for the BibTex file.</param>
         /// <returns>The type of the token and its value.</returns>
-        public IEnumerable<BibTexToken> Tokenise() {
+        /// <exception cref="ArgumentNullException">If
+        /// <paramref name="reader"/> is <c>null</c>.</exception>
+        public static IEnumerable<BibTexToken> Tokenise(TextReader reader) {
+            _ = reader ?? throw new ArgumentNullException(nameof(reader));
             int code = 0;
 
-            while ((code = this._reader.Read()) != -1) {
+            while ((code = reader.Read()) != -1) {
                 var c = (char) code;
 
                 yield return new BibTexToken(c switch {
                     '@' => BibTexTokenType.At,
+                    '\\' => BibTexTokenType.Backslash,
                     '{' => BibTexTokenType.BraceLeft,
                     '}' => BibTexTokenType.BraceRight,
                     ',' => BibTexTokenType.Comma,
@@ -62,9 +51,5 @@ namespace Visus.BibTex {
                 }, c);
             }
         }
-
-        #region Private fields
-        private readonly TextReader _reader;
-        #endregion
     }
 }
