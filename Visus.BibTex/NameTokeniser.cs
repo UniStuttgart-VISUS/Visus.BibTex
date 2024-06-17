@@ -206,7 +206,8 @@ namespace Visus.BibTex {
         /// </remarks>
         private static readonly Regex[] Separators = [
             new(@"^(and)\s+", RegexOptions.Compiled | RegexOptions.IgnoreCase),
-            new("^(;)", RegexOptions.Compiled)
+            new("^(;)", RegexOptions.Compiled),
+            new(@"^(\\&|&)", RegexOptions.Compiled)
         ];
         #endregion
 

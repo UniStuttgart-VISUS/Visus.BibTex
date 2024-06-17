@@ -226,7 +226,7 @@ namespace Visus.BibTex.Test {
 
         [TestMethod]
         public void TestMultipleNames() {
-            var input = "{{M}{\"u}ller-{L}{\"u}denscheidt} \t and \t Walter {Ulbricht}; Erich E. P. Honecker";
+            var input = "{{M}{\"u}ller-{L}{\"u}denscheidt} \t and \t Walter {Ulbricht}; Erich E. P. Honecker & King, Don\\&{von Berlichingen zu Hornberg}, Gottfried";
             var tokeniser = new NameTokeniser(input);
 
             {
@@ -281,6 +281,54 @@ namespace Visus.BibTex.Test {
                 var token = tokeniser.Next();
                 Assert.AreEqual(NameTokenType.Literal, token.Type);
                 Assert.AreEqual("Honecker", token.ToString());
+            }
+
+            {
+                var token = tokeniser.Next();
+                Assert.AreEqual(NameTokenType.Separator, token.Type);
+                Assert.AreEqual("&", token.ToString());
+            }
+
+            {
+                var token = tokeniser.Next();
+                Assert.AreEqual(NameTokenType.Literal, token.Type);
+                Assert.AreEqual("King", token.ToString());
+            }
+
+            {
+                var token = tokeniser.Next();
+                Assert.AreEqual(NameTokenType.Comma, token.Type);
+                Assert.AreEqual(",", token.ToString());
+            }
+
+            {
+                var token = tokeniser.Next();
+                Assert.AreEqual(NameTokenType.Literal, token.Type);
+                Assert.AreEqual("Don", token.ToString());
+            }
+
+            {
+                var token = tokeniser.Next();
+                Assert.AreEqual(NameTokenType.Separator, token.Type);
+                Assert.AreEqual("\\&", token.ToString());
+            }
+
+            {
+                var token = tokeniser.Next();
+                Assert.AreEqual(NameTokenType.Literal, token.Type);
+                Assert.AreEqual("von Berlichingen zu Hornberg", token.ToString());
+            }
+
+            {
+                var token = tokeniser.Next();
+                Assert.AreEqual(NameTokenType.Comma, token.Type);
+                Assert.AreEqual(",", token.ToString());
+            }
+
+            {
+                var token = tokeniser.Next();
+                Assert.AreEqual(NameTokenType.Literal, token.Type);
+                Assert.AreEqual("Gottfried", token.ToString());
             }
 
             {

@@ -21,22 +21,12 @@ namespace Visus.BibTex {
 
         #region Public class methods
         /// <summary>
-        /// Parse a name <see cref="ReadOnlySpan{char}"/> into a structured
-        /// object.
+        /// Parse a name <see cref="ReadOnlySpan{char}"/> into a list of
+        /// <see cref="Name"/>s.
         /// </summary>
         /// <param name="name">The string to be parsed.</param>
-        /// <returns>The name object representing the input string.</returns>
-        public static Name Parse(ReadOnlySpan<char> name) {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Parses a <see cref="ReadOnlySpan{char}"/ as a list of structured
-        /// names.
-        /// </summary>
-        /// <param name="names"></param>
-        /// <returns></returns>
-        public static IEnumerable<string> ParseList(ReadOnlySpan<char> names) {
+        /// <returns>The names represented by the input string.</returns>
+        public static IEnumerable<string> Parse(ReadOnlySpan<char> name) {
             throw new NotImplementedException();
         }
         #endregion
