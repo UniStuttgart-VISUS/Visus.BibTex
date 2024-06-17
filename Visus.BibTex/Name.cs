@@ -185,7 +185,7 @@ namespace Visus.BibTex {
         /// <inheritdoc />
         /// <exception cref="NotImplementedException"></exception>
         public string ToString(string? format,
-                IFormatProvider? formatProvider) {
+                IFormatProvider? formatProvider = null) {
             Debug.Assert(NameFormats.AbbreviatedSurname.Length == 1);
             Debug.Assert(NameFormats.ChristianInital.Length == 1);
             Debug.Assert(NameFormats.ChristianName.Length == 1);
