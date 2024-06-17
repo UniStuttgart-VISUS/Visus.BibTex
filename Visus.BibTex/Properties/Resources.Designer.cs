@@ -61,6 +61,15 @@ namespace Visus.BibTex.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The builder is already constructing another BibTex entry. Commit previous entries by calling Build() before creating new ones..
+        /// </summary>
+        internal static string ErrorBuilderActive {
+            get {
+                return ResourceManager.GetString("ErrorBuilderActive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An opening brace was expected at the begin of the BibTex body instead of &quot;{0}&quot;..
         /// </summary>
         internal static string ErrorInvalidEntryBegin {
@@ -129,6 +138,15 @@ namespace Visus.BibTex.Properties {
         internal static string ErrorMissingEquals {
             get {
                 return ResourceManager.GetString("ErrorMissingEquals", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The builder does not have a valid entry to work with. Call Create() to make such an entry..
+        /// </summary>
+        internal static string ErrorNoItem {
+            get {
+                return ResourceManager.GetString("ErrorNoItem", resourceCulture);
             }
         }
         

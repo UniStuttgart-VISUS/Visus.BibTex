@@ -6,7 +6,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using Visus.BibTex.Properties;
 
 
 namespace Visus.BibTex {
@@ -18,32 +21,56 @@ namespace Visus.BibTex {
     public sealed class BibItemBuilder : IBibItemBuilder<BibItem> {
 
         /// <inheritdoc />
-        public IBibItemBuilder<BibItem> AddField(BibItem item,
-                string name,
+        public IBibItemBuilder<BibItem> AddField(string name,
                 string value) {
-            ArgumentNullException.ThrowIfNull(item);
             ArgumentNullException.ThrowIfNull(name);
-            item[name.ToLowerInvariant()] = value;
+            this.ThrowIfNoItem();
+            this._item![name.ToLowerInvariant()] = value;
             return this;
         }
 
         /// <inheritdoc />
-        public IBibItemBuilder<BibItem> AddField(BibItem item,
-                string name,
+        public IBibItemBuilder<BibItem> AddField(string name,
                 IEnumerable<Name> value) {
-            ArgumentNullException.ThrowIfNull(item);
             ArgumentNullException.ThrowIfNull(name);
+            this.ThrowIfNoItem();
 
             if (value.Any()) {
-                item[name.ToLowerInvariant()] = value;
+                this._item![name.ToLowerInvariant()] = value;
             } else {
-                item[name.ToLowerInvariant()] = null;
+                this._item![name.ToLowerInvariant()] = null;
             }
 
             return this;
         }
 
         /// <inheritdoc />
-        public BibItem Create(string type, string key) => new(type, key);
+        public BibItem Build() => this._item
+            ?? throw new InvalidOperationException(Resources.ErrorNoItem);
+
+        /// <inheritdoc />
+        public IBibItemBuilder<BibItem> Create(string type, string key) {
+            if (this._item != null) {
+                throw new InvalidOperationException(Resources.ErrorBuilderActive);
+            }
+
+            this._item = new(type, key);
+            return this;
+        }
+
+        #region Private methods
+        /// <summary>
+        /// Throws <see cref="InvalidOperationException"/> if
+        /// <see cref="_item"/> is <c>null</c>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
+        [MemberNotNull(nameof(_item))]
+        private void ThrowIfNoItem() => _ = this._item
+            ?? throw new InvalidOperationException(Resources.ErrorNoItem);
+        #endregion
+
+        #region Private fields
+        private BibItem? _item;
+        #endregion
     }
 }

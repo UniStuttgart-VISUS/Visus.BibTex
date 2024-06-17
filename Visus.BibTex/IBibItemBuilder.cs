@@ -4,8 +4,9 @@
 // </copyright>
 // <author>Christoph Müller</author>
 
-
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+
 
 namespace Visus.BibTex {
 
@@ -17,35 +18,53 @@ namespace Visus.BibTex {
     public interface IBibItemBuilder<TBibItem> {
 
         /// <summary>
-        /// Adds a field named <paramref name="name"/> to the given BibTex
-        /// <paramref name="item"/>.
+        /// Adds a field named <paramref name="name"/> to the currently
+        /// constructed BibTex entry.
         /// </summary>
-        /// <param name="item"></param>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
+        /// <param name="name">The name of the field.</param>
+        /// <param name="value">The value of the field.</param>
         /// <returns><c>this</c>.</returns>
-        IBibItemBuilder<TBibItem> AddField(TBibItem item, string name,
-            string value);
+        /// <exception cref="System.ArgumentNullException">If
+        /// <paramref name="name"/> is <c>null</c>.</exception>
+        /// <exception cref="System.InvalidOperationException">If no item has
+        /// been created before trying to add a field.</exception>
+        IBibItemBuilder<TBibItem> AddField(string name, string value);
 
         /// <summary>
-        /// Adds a field named <paramref name="name"/> to the given BibTex
-        /// <paramref name="item"/>.
+        /// Adds a field named <paramref name="name"/> to the currently
+        /// constructed BibTex entry.
         /// </summary>
-        /// <param name="item"></param>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
+        /// <param name="name">The name of the field.</param>
+        /// <param name="value">The value of the field.</param>
         /// <returns><c>this</c>.</returns>
-        IBibItemBuilder<BibItem> AddField(TBibItem item, string name,
-            IEnumerable<Name> value);
+        /// <exception cref="System.ArgumentNullException">If
+        /// <paramref name="name"/> is <c>null</c>.</exception>
+        /// <exception cref="System.InvalidOperationException">If no item has
+        /// been created before trying to add a field.</exception>
+        IBibItemBuilder<TBibItem> AddField(string name, IEnumerable<Name> value);
 
         /// <summary>
-        /// Creates a new entry of the specified <paramref name="type"> and with
-        /// the specified <paramref name="key"/>.
+        /// Returns the item that has been built and resets the builder to its
+        /// initial state.
+        /// </summary>
+        /// <returns>The item that has been constructed by previous calls.
+        /// </returns>
+        /// <exception cref="System.InvalidOperationException">If no item has
+        /// been created before building it.</exception>
+        [return: NotNull] TBibItem Build();
+
+        /// <summary>
+        /// Resets the builder to start a new entry of the specified
+        /// <paramref name="type"> and with the specified
+        /// <paramref name="key"/>.
         /// </summary>
         /// <param name="type">The type of the BibTex entry.</param>
         /// <param name="key">The key of the entry.</param>
-        /// <returns>A new BibTex entry.</returns>
-        TBibItem Create(string type, string key);
+        /// <returns><c>this</c>.</returns>
+        /// <exception cref="System.InvalidOperationException">If a previous
+        /// item has not been committed by calling <see cref="Build"/>.
+        /// </exception>
+        IBibItemBuilder<TBibItem> Create(string type, string key);
 
     }
 }

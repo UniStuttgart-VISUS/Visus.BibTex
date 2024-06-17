@@ -317,15 +317,11 @@ namespace Visus.BibTex {
 
             // Next, we parse the fields, for which we need to construct the
             // return value.
-            entry = state.Builder.Create(type, key);
-            if (entry == null) {
-                throw new InvalidOperationException(
-                    Resources.ErrorInvalidEntryBuilt);
-            }
+            state.Builder.Create(type, key);
 
             while (state.CurrentTokenType != BibTexTokenType.BraceRight) {
                 var field = ParseField(state);
-                state.Builder.AddField(entry, field.Item1, field.Item2);
+                state.Builder.AddField(field.Item1, field.Item2);
 
                 if (state.CurrentTokenType == BibTexTokenType.Comma) {
                     // Consume the trailing comma at the end of the entry.
@@ -341,6 +337,7 @@ namespace Visus.BibTex {
             // Consume the closing brace.
             state.MoveNext();
 
+            entry = state.Builder.Build();
             return true;
         }
 

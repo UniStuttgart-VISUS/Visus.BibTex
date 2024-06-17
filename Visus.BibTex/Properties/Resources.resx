@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ErrorBuilderActive" xml:space="preserve">
+    <value>The builder is already constructing another BibTex entry. Commit previous entries by calling Build() before creating new ones.</value>
+  </data>
   <data name="ErrorInvalidEntryBegin" xml:space="preserve">
     <value>An opening brace was expected at the begin of the BibTex body instead of "{0}".</value>
   </data>
@@ -140,6 +143,9 @@
   </data>
   <data name="ErrorMissingEquals" xml:space="preserve">
     <value>The name and the value of a field must be delimited by "=" instead of "{0}".</value>
+  </data>
+  <data name="ErrorNoItem" xml:space="preserve">
+    <value>The builder does not have a valid entry to work with. Call Create() to make such an entry.</value>
   </data>
   <data name="ErrorPrematureEnd" xml:space="preserve">
     <value>The end of the input was reached prematurely.</value>
