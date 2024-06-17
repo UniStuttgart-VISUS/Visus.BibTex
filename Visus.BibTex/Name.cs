@@ -19,6 +19,28 @@ namespace Visus.BibTex {
     /// </summary>
     public sealed class Name : IFormattable {
 
+        #region Public class methods
+        /// <summary>
+        /// Parse a name <see cref="ReadOnlySpan{char}"/> into a structured
+        /// object.
+        /// </summary>
+        /// <param name="name">The string to be parsed.</param>
+        /// <returns>The name object representing the input string.</returns>
+        public static Name Parse(ReadOnlySpan<char> name) {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Parses a <see cref="ReadOnlySpan{char}"/ as a list of structured
+        /// names.
+        /// </summary>
+        /// <param name="names"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> ParseList(ReadOnlySpan<char> names) {
+            throw new NotImplementedException();
+        }
+        #endregion
+
         #region Public constructors
         /// <summary>
         /// Initialises a new instance.
@@ -257,6 +279,20 @@ namespace Visus.BibTex {
             middleNames = this.MiddleNames;
             suffix = this.Suffix;
         }
+        #endregion
+
+        #region Private constants
+        /// <summary>
+        /// These tokens are not considered individual names.
+        /// </summary>
+        private static readonly IEnumerable<string> Affixes = [ "von",
+            "zu", "van", "der", "den" ];
+
+        /// <summary>
+        /// These tokens are recognised as suffixes.
+        /// </summary>
+        private static readonly IEnumerable<string> Suffixes = [ "jr",
+            "jr.", "sr", "sr.", "jnr", "snr" ];
         #endregion
 
         #region Private fields
