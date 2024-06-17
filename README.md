@@ -14,6 +14,10 @@ The library parses people into structured objects of type `Visus.BibTex.Name`. Y
 var author = new Name("Ulbricht", "Walter");
 Console.WriteLine(author.Surname);
 Console.WriteLine(author.ChristianName);
+
+// Expected console output:
+// Ulbricht
+// Walter
 ```
 
 `Name`s also support decomposition:
@@ -24,6 +28,11 @@ var (surname, christianName, middleNames) = author;
 Console.WriteLine(author.Surname);
 Console.WriteLine(author.ChristianName);
 Console.WriteLine(string.Join(" ", author.MiddleNames));
+
+// Expected console output:
+// Ulbricht
+// Walter
+// Ernst Paul
 ```
 
 `Name` implements `IFormattable` and thus supports formatting using the formats defined in `Visus.BibTex.NameFormats`.
@@ -31,6 +40,9 @@ Console.WriteLine(string.Join(" ", author.MiddleNames));
 ```C#
 var author = new Name("Ulbricht", "Walter", "Ernst", "Paul");
 Console.WriteLine(author.ToString(NameFormats.SurnameChristianNameMiddleNames));
+
+// Expected console output:
+// Ulbricht, Walter Ernst Paul
 ```
 
 You can also combine the single-character formats to form custom ones:
@@ -38,6 +50,9 @@ You can also combine the single-character formats to form custom ones:
 ```C#
 var author = new Name("Ulbricht", "Walter", "Ernst", "Paul");
 Console.WriteLine(author.ToString("SCm"));
+
+// Expected console output:
+// Ulbricht, Walter E. P.
 ```
 
 The formats that can be combined are "S" for the surname, "C" for the Christian name, "M" for the middle names and "X" for a name suffix like "jr." All except for the suffix support abbreviation by specifying the lower-case variant.
