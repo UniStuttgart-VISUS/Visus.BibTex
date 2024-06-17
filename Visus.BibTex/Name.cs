@@ -288,6 +288,7 @@ namespace Visus.BibTex {
         private static readonly IEnumerable<string> Affixes = [ "von",
             "zu", "van", "der", "den" ];
 
+
         /// <summary>
         /// These tokens are recognised as suffixes.
         /// </summary>
