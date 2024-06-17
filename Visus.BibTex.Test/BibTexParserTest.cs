@@ -18,9 +18,75 @@ namespace Visus.BibTex.Test {
 
         [TestMethod]
         public void TestSingle() {
-            var bibtex = "@article{hugo, year=2024}";
-            var items = BibTexParser<BibItem>.Parse(new StringReader(bibtex));
-            items.ToList();
+            {
+                var bibtex = "@article{hugo, year=2024}";
+                var items = BibTexParser<BibItem>.Parse<BibItemBuilder>(new StringReader(bibtex)).ToList();
+                Assert.AreEqual(1, items.Count());
+                Assert.AreEqual("article", items.First().Type);
+                Assert.AreEqual("hugo", items.First().Key);
+                Assert.IsTrue(items.First().ContainsField("year"));
+            }
+
+            {
+                var bibtex = "@ article   {   hugo  , year  =  2024   }";
+                var items = BibTexParser<BibItem>.Parse<BibItemBuilder>(new StringReader(bibtex)).ToList();
+                Assert.AreEqual(1, items.Count());
+                Assert.AreEqual(1, items.Count());
+                Assert.AreEqual("article", items.First().Type);
+                Assert.AreEqual("hugo", items.First().Key);
+                Assert.IsTrue(items.First().ContainsField("year"));
+            }
+
+            {
+                var bibtex = "@ article{hugo,year=\"2024\"}";
+                var items = BibTexParser<BibItem>.Parse<BibItemBuilder>(new StringReader(bibtex)).ToList();
+                Assert.AreEqual(1, items.Count());
+                Assert.AreEqual(1, items.Count());
+                Assert.AreEqual("article", items.First().Type);
+                Assert.AreEqual("hugo", items.First().Key);
+                Assert.IsTrue(items.First().ContainsField("year"));
+            }
+
+            {
+                var bibtex = "@ article   {   hugo  , year  =  \"2024\"   }";
+                var items = BibTexParser<BibItem>.Parse<BibItemBuilder>(new StringReader(bibtex)).ToList();
+                Assert.AreEqual(1, items.Count());
+                Assert.AreEqual(1, items.Count());
+                Assert.AreEqual("article", items.First().Type);
+                Assert.AreEqual("hugo", items.First().Key);
+                Assert.IsTrue(items.First().ContainsField("year"));
+            }
+
+
+            {
+                var bibtex = "@ article{hugo,year={2024}}";
+                var items = BibTexParser<BibItem>.Parse<BibItemBuilder>(new StringReader(bibtex)).ToList();
+                Assert.AreEqual(1, items.Count());
+                Assert.AreEqual(1, items.Count());
+                Assert.AreEqual("article", items.First().Type);
+                Assert.AreEqual("hugo", items.First().Key);
+                Assert.IsTrue(items.First().ContainsField("year"));
+            }
+
+            {
+                var bibtex = "@ article   {   hugo  , year  =  {2024}   }";
+                var items = BibTexParser<BibItem>.Parse<BibItemBuilder>(new StringReader(bibtex)).ToList();
+                Assert.AreEqual(1, items.Count());
+                Assert.AreEqual(1, items.Count());
+                Assert.AreEqual("article", items.First().Type);
+                Assert.AreEqual("hugo", items.First().Key);
+                Assert.IsTrue(items.First().ContainsField("year"));
+            }
+
+            {
+                var bibtex = "@ article   {   hugo  , year  =  {{2024}}   }";
+                var items = BibTexParser<BibItem>.Parse<BibItemBuilder>(new StringReader(bibtex)).ToList();
+                Assert.AreEqual(1, items.Count());
+                Assert.AreEqual(1, items.Count());
+                Assert.AreEqual("article", items.First().Type);
+                Assert.AreEqual("hugo", items.First().Key);
+                Assert.IsTrue(items.First().ContainsField("year"));
+            }
         }
     }
 }

@@ -27,6 +27,45 @@ namespace Visus.BibTex {
         public BibTexTokenType Type { get; } = type;
         #endregion
 
+        #region Public methods
+        /// <summary>
+        /// Answer whether <see cref="Type"/> is <paramref name="type" />.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public bool Is(BibTexTokenType type) => (this.Type == type);
+
+        /// <summary>
+        /// Answer whether the token is any of the specified types.
+        /// </summary>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        public bool IsAnyOf(params BibTexTokenType[] tokens) {
+            if (tokens == null) {
+                return false;
+            }
+
+            foreach (var t in tokens) {
+                if (this.Type == t) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Answer whether the token is a white space, possibly including the
+        /// new line token as white space, too.
+        /// </summary>
+        /// <param name="includeNewLine"></param>
+        /// <returns></returns>
+        public bool IsWhiteSpace(bool includeNewLine) {
+            return (this.Type == BibTexTokenType.WhiteSpace)
+                || (includeNewLine && (this.Type == BibTexTokenType.NewLine));
+        }
+        #endregion
+
         #region Public deconstructors
         /// <summary>
         /// Deconstruct the object into a tuple.
