@@ -150,26 +150,6 @@ namespace Visus.BibTex {
         }
 
         /// <summary>
-        /// &quot;Consumes&quot; <see cref="_input"/> discarding the specified
-        /// <paramref name="offset"/>.
-        /// </summary>
-        /// <param name="offset"></param>
-        /// <param name="length"></param>
-        /// <param name="additional">Consume the specified additional number of
-        /// characters, but do not include them in the input. This parameter
-        /// defaults to zero, ie <paramref name="length"/> characters are
-        /// returned and consumed.</param>
-        /// <returns></returns>
-        private ReadOnlySpan<char> Consume(int offset, int length,
-                int additional = 0) {
-            Debug.Assert(offset < this._input.Length);
-            Debug.Assert(offset + length <= this._input.Length);
-            var retval = this._input.Slice(offset, length);
-            this._input = this._input.Slice(offset + length + additional);
-            return retval;
-        }
-
-        /// <summary>
         /// &quot;Consumes&quot; <paramref name="length"/> characters by
         /// creating a new span as return value and setting the remainder as the
         /// new value of <see cref="_input"/>. If the whole range defined
