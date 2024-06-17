@@ -18,6 +18,7 @@ namespace Visus.BibTex {
     /// <param name="input">The input to be processed.</param>
     internal ref struct NameTokeniser(ReadOnlySpan<char> input) {
 
+        #region Public methods
         /// <summary>
         /// Scans and returns the next token.
         /// </summary>
@@ -110,6 +111,7 @@ namespace Visus.BibTex {
 
             return new(NameTokenType.Literal, this.Consume(this._input.Length, true));
         }
+        #endregion
 
         #region Private methods
         /// <summary>
@@ -202,7 +204,8 @@ namespace Visus.BibTex {
         /// window over the input.
         /// </summary>
         /// <remarks>
-        /// The part to be consumed must be in a match group.
+        /// The part to be consumed must be in the first match group of each
+        /// expression.
         /// </remarks>
         private static readonly Regex[] Separators = [
             new(@"^(and)\s+", RegexOptions.Compiled | RegexOptions.IgnoreCase),

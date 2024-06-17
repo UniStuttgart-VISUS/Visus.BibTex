@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 
 namespace Visus.BibTex {
@@ -26,8 +27,48 @@ namespace Visus.BibTex {
         /// </summary>
         /// <param name="name">The string to be parsed.</param>
         /// <returns>The names represented by the input string.</returns>
-        public static IEnumerable<string> Parse(ReadOnlySpan<char> name) {
-            throw new NotImplementedException();
+        public static IEnumerable<Name> Parse(ReadOnlySpan<char> name) {
+            NameTokeniser tokeniser = new(name);
+            List<Name> retval = new();
+
+            var commaIsSeparator = false;
+            var haveSeparator = false;
+            var literalSequence = 0;            // # of subsequent literals.
+            var surname = new StringBuilder();
+
+            while (true) {
+                var token = tokeniser.Next();
+
+                switch (token.Type) {
+                    case NameTokenType.Comma:
+                        literalSequence = 0;
+                        break;
+
+                    case NameTokenType.End:
+                        return retval;
+
+                    case NameTokenType.Literal:
+                        if (Affixes.IsMatch(token.Text)) {
+                            surname.Append(token.Text);
+
+                        } else if (Suffixes.IsMatch(token.Text)) {
+
+                        }
+                        break;
+
+                    case NameTokenType.Separator:
+                        haveSeparator = true;
+                        literalSequence = 0;
+                        break;
+
+                    default:
+                        throw new NotImplementedException("An unexpected token "
+                            + "was encountered while parsing names. This is "
+                            + "a bug in Name.Parse(), which was not updated "
+                            + "to account for new tokens produced by the "
+                            + "tokeniser.");
+                }
+            }
         }
         #endregion
 
@@ -275,15 +316,14 @@ namespace Visus.BibTex {
         /// <summary>
         /// These tokens are not considered individual names.
         /// </summary>
-        private static readonly IEnumerable<string> Affixes = [ "von",
-            "zu", "van", "der", "den" ];
-
+        private static readonly Regex Affixes = new("^(von|zu|van|der|den)$",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         /// <summary>
         /// These tokens are recognised as suffixes.
         /// </summary>
-        private static readonly IEnumerable<string> Suffixes = [ "jr",
-            "jr.", "sr", "sr.", "jnr", "snr" ];
+        private static readonly Regex Suffixes = new(@"^(jn?r\.?|sn?r\.?)$",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase);
         #endregion
 
         #region Private fields
