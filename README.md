@@ -1,6 +1,6 @@
 # Visus.BibTex
 
-[![Build Status](https://visualisierungsinstitut.visualstudio.com/Visus.LdapAuthentication/_apis/build/status/UniStuttgart-VISUS.Visus.BibTex?branchName=master)](https://visualisierungsinstitut.visualstudio.com/Visus.BibTex/_build/latest?definitionId=9&branchName=master)
+[![Build Status](https://visualisierungsinstitut.visualstudio.com/Visus.BibTex/_apis/build/status/UniStuttgart-VISUS.Visus.BibTex?branchName=master)](https://visualisierungsinstitut.visualstudio.com/Visus.BibTex/_build/latest?definitionId=9&branchName=master)
 
 A library for parsing and manipulating BibTex entries in .NET 8+.
 
