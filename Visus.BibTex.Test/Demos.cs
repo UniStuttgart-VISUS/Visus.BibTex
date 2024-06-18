@@ -6,6 +6,8 @@
 
 
 using System;
+using System.IO;
+using System.Linq;
 
 namespace Visus.BibTex.Test {
 
@@ -47,6 +49,35 @@ namespace Visus.BibTex.Test {
                 Console.WriteLine(author.ToString("SCm"));
                 Assert.AreEqual("Ulbricht, Walter E. P.", author.ToString("SCm"));
             }
+        }
+
+        [TestMethod]
+        public void BibTexParsing() {
+            var bibtex = """
+@Book{hershkovitz-62,
+    author = "P. Hershkovitz",
+    year = "1962",
+    title = "Evolution of {Neotropical} cricetine rodents ({Muridae}) with special reference to the phyllotine group",
+    series = "Fieldiana: Zoology",
+    volume = "46",
+    address = "Chicago",
+    publisher = "Field Museum of Natural History"
+}
+""";
+            var item = BibTexParser<BibItem>.Parse<BibItemBuilder>(new StringReader(bibtex)).SingleOrDefault();
+
+            Assert.IsNotNull(item);
+            Assert.IsNotNull(item.Author);
+            Assert.AreEqual(1, item.Author.Count());
+            Assert.AreEqual("P.", item.Author.Single().GivenName);
+            Assert.AreEqual("Hershkovitz", item.Author.Single().Surname);
+            Assert.AreEqual("1962", item.Year);
+            Assert.AreEqual("Evolution of {Neotropical} cricetine rodents ({Muridae}) with special reference to the phyllotine group", item.Title);
+            Assert.AreEqual("Fieldiana: Zoology", item.Series);
+            Assert.AreEqual("46", item.Volume);
+            Assert.AreEqual("Chicago", item.Address);
+            Assert.AreEqual("Field Museum of Natural History", item.Publisher);
+
         }
     }
 }

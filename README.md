@@ -5,6 +5,25 @@ A library for parsing and manipulating BibTex entries in .NET 8+.
 
 ## Usage
 
+### Parsing
+BibTex can be parsed from any `TextReader`, for instance a `StringReader` in the following example, and yields an enumeration of items of the requested type:
+
+```C#
+var bibtex = """
+@Book{hershkovitz-62,
+    author = "P. Hershkovitz",
+    year = "1962",
+    title = "Evolution of {Neotropical} cricetine rodents ({Muridae}) with special reference to the phyllotine group",
+    series = "Fieldiana: Zoology",
+    volume = "46",
+    address = "Chicago",
+    publisher = "Field Museum of Natural History"
+}
+""";
+var item = BibTexParser<BibItem>.Parse<BibItemBuilder>(new StringReader(bibtex)).SingleOrDefault();
+```
+
+
 ### BibItems
 The library provides a `Dictionary`-based implementation of a BibTex entry in the form of the [`Visus.BibTex.BibItem`](Visus.BibTex/BibItem.cs) class. However, callers can customise the parser to fill their own class by implementing [`Visus.BibTex.IBibItemBuilder`](Visus.BibTex/IBibItemBuilder.cs) for this class. [`Visus.BibTex.BibItemBuilder`](Visus.BibTex/BibItemBuilder.cs) is the reference implementation for the default item type.
 
