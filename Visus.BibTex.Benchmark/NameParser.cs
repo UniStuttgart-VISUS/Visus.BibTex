@@ -19,7 +19,7 @@ namespace Visus.BibTex.Benchmark {
         [Params("Honecker, Erich",
             "Erich Honecker",
             "Honecker, Erich and Ulbricht, Walter",
-            "Erich Honekcer and Walter Ulbricht",
+            "Erich Honecker and Walter Ulbricht",
             "Ulbricht, Walter Ernst Paul and Honecker, Erich Ernst Paul and Maleuda, Günther and Mittag, Günter and Schabowski, Günter",
             "Walter Ernst Paul Ulbricht and Erich Ernst Paul Honecker and Günther Maleuda and Günter Mittag and Günter Schabowski"
             )]
