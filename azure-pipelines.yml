@@ -46,5 +46,6 @@ steps:
     configuration: '$(buildConfiguration)'
     testSelector: 'testAssemblies'
     testAssemblyVer2: |
-      **\*Tests.dll
+      **\*Test.dll
+      **\*Benchmark.dll
     searchFolder: '$(System.DefaultWorkingDirectory)'
