@@ -1,0 +1,50 @@
+#
+# azure-pipelines.yml
+#
+# Copyright © 2024 Visualisierungsinstitut der Universität Stuttgart. Alle Rechte vorbehalten.
+#
+
+trigger:
+- master
+
+schedules:
+- cron: '0 13 * * 0'
+  displayName: Weekly Sunday build
+  branches:
+    include:
+    - master
+  always: true
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+- task: NuGetToolInstaller@1
+
+- task: UseDotNet@2
+  inputs:
+    version: '8.x'
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: VSTest@2
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    testSelector: 'testAssemblies'
+    testAssemblyVer2: |
+      **\*Tests.dll
+    searchFolder: '$(System.DefaultWorkingDirectory)'
