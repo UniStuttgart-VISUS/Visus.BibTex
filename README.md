@@ -92,7 +92,7 @@ Console.Write(string.Join("; ", authors));
 The library makes best effort to recognise different formats of names, but it works best if authors are separated by the common "and":
 
 ```C#
-var authors = Name.Parse("Walter Ulbricht  and Erich Honecker");
+var authors = Name.Parse("Walter Ulbricht and Erich Honecker");
 Console.Write(string.Join("; ", authors));
 
 // Expected console output:
@@ -102,4 +102,23 @@ Console.Write(string.Join("; ", authors));
 // instance if surnames comprise of more than one token.
 var authors = Name.Parse("Walter Ulbricht, Erich Honecker");
 Console.Write(string.Join("; ", authors));
+```
+
+Note that the parser honours braces around names by not tokenising braced expressions:
+
+```C#
+var authors = Name.Parse("{Visualisierungsinstitut der Universität Suttgart}");
+Console.Write(string.Join("; ", authors));
+
+// Expected console output:
+// {Visualisierungsinstitut der Universität Suttgart}
+```
+
+However, it will not remove the braces nor process any Latex instructions:
+```C#
+var authors = Name.Parse("{Visualisierungsinstitut der Universit\\\"at Suttgart}");
+Console.Write(string.Join("; ", authors));
+
+// Expected console output:
+// {Visualisierungsinstitut der Universit\"at Suttgart}
 ```

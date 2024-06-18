@@ -67,6 +67,18 @@ namespace Visus.BibTex.Test {
                 Console.Write(string.Join("; ", authors));
                 Assert.AreEqual("Ulbricht, Walter; Honecker, Erich", string.Join("; ", authors));
             }
+
+            {
+                var authors = Name.Parse("{Visualisierungsinstitut der Universität Suttgart}");
+                Console.Write(string.Join("; ", authors));
+                Assert.AreEqual("{Visualisierungsinstitut der Universität Suttgart}", string.Join("; ", authors));
+            }
+
+            {
+                var authors = Name.Parse("{Visualisierungsinstitut der Universit\\\"at Suttgart}");
+                Console.Write(string.Join("; ", authors));
+                Assert.AreEqual("{Visualisierungsinstitut der Universit\\\"at Suttgart}", string.Join("; ", authors));
+            }
         }
 
         [TestMethod]
