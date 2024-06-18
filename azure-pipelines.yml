@@ -47,5 +47,4 @@ steps:
     testSelector: 'testAssemblies'
     testAssemblyVer2: |
       **\*Test.dll
-      **\*Benchmark.dll
     searchFolder: '$(System.DefaultWorkingDirectory)'
