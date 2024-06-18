@@ -100,6 +100,36 @@ namespace Visus.BibTex.Test {
                 Assert.AreEqual("Henry", names.Single().MiddleNames.First());
                 Assert.AreEqual("III.", names.Single().Suffix);
             }
+
+            {
+                var input = "Mittag, G{\\\"u}nter";
+                var names = NameParser.ParseList(input).ToList();
+                Assert.IsNotNull(names);
+                Assert.IsTrue(names.Any());
+                Assert.AreEqual("Mittag", names.Single().Surname);
+                Assert.AreEqual("G{\\\"u}nter", names.Single().ChristianName);
+                Assert.IsFalse(names.Single().MiddleNames.Any());
+            }
+
+            {
+                var input = "Maleuda, {G\\\"unther}";
+                var names = NameParser.ParseList(input).ToList();
+                Assert.IsNotNull(names);
+                Assert.IsTrue(names.Any());
+                Assert.AreEqual("Maleuda", names.Single().Surname);
+                Assert.AreEqual("{G\\\"unther}", names.Single().ChristianName);
+                Assert.IsFalse(names.Single().MiddleNames.Any());
+            }
+
+            {
+                var input = "伊藤,貴之";
+                var names = NameParser.ParseList(input).ToList();
+                Assert.IsNotNull(names);
+                Assert.IsTrue(names.Any());
+                Assert.AreEqual("伊藤", names.Single().Surname);
+                Assert.AreEqual("貴之", names.Single().ChristianName);
+                Assert.IsFalse(names.Single().MiddleNames.Any());
+            }
         }
 
         [TestMethod]
@@ -178,6 +208,36 @@ namespace Visus.BibTex.Test {
                 Assert.AreEqual(1, names.Single().MiddleNames.Count());
                 Assert.AreEqual("Henry", names.Single().MiddleNames.First());
                 Assert.AreEqual("III.", names.Single().Suffix);
+            }
+
+            {
+                var input = "G{\\\"u}nter Mittag";
+                var names = NameParser.ParseList(input).ToList();
+                Assert.IsNotNull(names);
+                Assert.IsTrue(names.Any());
+                Assert.AreEqual("Mittag", names.Single().Surname);
+                Assert.AreEqual("G{\\\"u}nter", names.Single().ChristianName);
+                Assert.IsFalse(names.Single().MiddleNames.Any());
+            }
+
+            {
+                var input = "{G\\\"unther} Maleuda";
+                var names = NameParser.ParseList(input).ToList();
+                Assert.IsNotNull(names);
+                Assert.IsTrue(names.Any());
+                Assert.AreEqual("Maleuda", names.Single().Surname);
+                Assert.AreEqual("{G\\\"unther}", names.Single().ChristianName);
+                Assert.IsFalse(names.Single().MiddleNames.Any());
+            }
+
+            {
+                var input = "貴之 伊藤";
+                var names = NameParser.ParseList(input).ToList();
+                Assert.IsNotNull(names);
+                Assert.IsTrue(names.Any());
+                Assert.AreEqual("伊藤", names.Single().Surname);
+                Assert.AreEqual("貴之", names.Single().ChristianName);
+                Assert.IsFalse(names.Single().MiddleNames.Any());
             }
         }
     }
