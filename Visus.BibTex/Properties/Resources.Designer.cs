@@ -70,6 +70,15 @@ namespace Visus.BibTex.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The name of a string variable cannot be empty..
+        /// </summary>
+        internal static string ErrorEmptyVariableName {
+            get {
+                return ResourceManager.GetString("ErrorEmptyVariableName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An opening brace was expected at the begin of the BibTex body instead of &quot;{0}&quot;..
         /// </summary>
         internal static string ErrorInvalidEntryBegin {
@@ -133,6 +142,15 @@ namespace Visus.BibTex.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An unexpected &quot;{0}&quot; was found at the begin of the name of a string variable..
+        /// </summary>
+        internal static string ErrorInvalidVariableNameBegin {
+            get {
+                return ResourceManager.GetString("ErrorInvalidVariableNameBegin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The name and the value of a field must be delimited by &quot;=&quot; instead of &quot;{0}&quot;..
         /// </summary>
         internal static string ErrorMissingEquals {
@@ -156,6 +174,15 @@ namespace Visus.BibTex.Properties {
         internal static string ErrorPrematureEnd {
             get {
                 return ResourceManager.GetString("ErrorPrematureEnd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The variable &quot;{0}&quot; was not found in the BibTex file or has not been injected via parser options..
+        /// </summary>
+        internal static string ErrorUnknownVariable {
+            get {
+                return ResourceManager.GetString("ErrorUnknownVariable", resourceCulture);
             }
         }
     }

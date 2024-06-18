@@ -933,7 +933,15 @@ namespace Visus.BibTex.Test {
 }
 """;
 
-            var items = BibTexParser<BibItem>.Parse<BibItemBuilder>(new StringReader(bibtex)).ToList();
+            var options = new BibTexParserOptions<BibItem>() {
+                Builder = new BibItemBuilder()
+            };
+            options.Variables.Add("dec", "December");
+            options.Variables.Add("mar", "March");
+            options.Variables.Add("may", "May");
+            options.Variables.Add("aug", "August");
+            var items = BibTexParser<BibItem>.Parse(new StringReader(bibtex), options).ToList();
+            Assert.AreEqual(85, items.Count);
         }
     }
 }

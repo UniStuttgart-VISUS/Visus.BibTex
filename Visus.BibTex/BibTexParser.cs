@@ -102,6 +102,10 @@ namespace Visus.BibTex {
                 this._tokens = tokens
                     ?? throw new ArgumentNullException(nameof(tokens));
                 this.MoveNext();
+
+                foreach (var v in this.Options.Variables) {
+                    this.Variables.Add(v.Key, v.Value);
+                }
             }
 
             /// <summary>
@@ -148,6 +152,11 @@ namespace Visus.BibTex {
             /// Gets the current offset into the input.
             /// </summary>
             public int Offset { get; private set; }
+
+            /// <summary>
+            /// Gets the variables parsed from the file.
+            /// </summary>
+            public Dictionary<string, string> Variables { get; } = new();
 
             /// <summary>
             /// Moves the iterator forward and updates the state accordingly.
@@ -396,13 +405,14 @@ namespace Visus.BibTex {
             // be without quotes, strings in quotes and strings in braces.
             var value = state.CurrentTokenType switch {
                 BibTexTokenType.Digit => ParseDigits(state),
-                BibTexTokenType.Quote => ParseQuotedString(state),
+                BibTexTokenType.Quote => ParseQuotedStrings(state),
+                BibTexTokenType.Letter => ParseQuotedStrings(state),
                 BibTexTokenType.BraceLeft => ParseBracedString(state),
                 _ => throw new FormatException(string.Format(
                     Resources.ErrorInvalidFieldValueBegin,
                     state.CurrentCharacter))
             };
-            Debug.Write($"Field value is \"{value}\".");
+            Debug.WriteLine($"Field value is \"{value}\".");
 
             // Skip trailing spaces, such that the caller is on the comma
             // separating two fields or on the brace ending the entry.
@@ -412,11 +422,36 @@ namespace Visus.BibTex {
         }
 
         /// <summary>
+        /// Parses an identifier that ends with any of the specified
+        /// <paramref name="tokens"/>.
+        /// </summary>
+        /// <param name="state"></param>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        private static string ParseIdentifier(State state,
+                params BibTexTokenType[] tokens) {
+            Debug.Assert(state != null);
+
+            if ((tokens == null) || (tokens.Length < 1)) {
+                tokens = [ BibTexTokenType.WhiteSpace ];
+            }
+
+            var retval = new StringBuilder();
+
+            while (state.IsValid && !state.CurrentToken.IsAnyOf(tokens)) {
+                retval.Append(state.CurrentCharacter);
+                state.MoveNext();
+            }
+
+            return retval.ToString();
+        }
+
+        /// <summary>
         /// Parses a string in quotes.
         /// </summary>
         /// <param name="state"></param>
         /// <returns></returns>
-        private static string ParseQuotedString(State state) {
+        private static StringBuilder ParseQuotedString(State state) {
             Debug.Assert(state != null);
             Debug.Assert(state.IsValid);
             Debug.Assert(state.CurrentTokenType == BibTexTokenType.Quote);
@@ -435,7 +470,7 @@ namespace Visus.BibTex {
                             retval.Append(state.CurrentCharacter);
                         } else {
                             state.MoveNext();
-                            return retval.ToString();
+                            return retval;
                         }
                         break;
 
@@ -447,6 +482,47 @@ namespace Visus.BibTex {
             }
 
             throw new FormatException(Resources.ErrorPrematureEnd);
+        }
+
+        /// <summary>
+        /// Parses a sequence of strings in quotes that are (potentially)
+        /// concatenated using the hash operator.
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        private static string ParseQuotedStrings(State state) {
+            var retval = new StringBuilder();
+
+            while (true) {
+                switch (state.CurrentTokenType) {
+                    case BibTexTokenType.Quote:
+                        retval.Append(ParseQuotedString(state));
+                        ScanWhiteSpaces(state, true);
+                        break;
+
+                    case BibTexTokenType.Hash:
+                        state.MoveNext();
+                        ScanWhiteSpaces(state, true);
+                        break;
+
+                    case BibTexTokenType.Letter: {
+                        var name = ParseIdentifier(state,
+                            BibTexTokenType.WhiteSpace,
+                            BibTexTokenType.Comma);
+                        Debug.WriteLine($"Requested variable \"{name}\".");
+                        if (state.Variables.TryGetValue(name, out var value)) {
+                            retval.Append(value);
+                        } else {
+                            throw new FormatException(string.Format(
+                                Resources.ErrorUnknownVariable,
+                                name));
+                        }
+                        }break;
+
+                    default:
+                        return retval.ToString();
+                }
+            }
         }
 
         /// <summary>
@@ -467,6 +543,39 @@ namespace Visus.BibTex {
             }
 
             return retval.ToString();
+        }
+
+        /// <summary>
+        /// Parses a &quot;@string&quot; variable declaration and stores the
+        /// variable in the <paramref name="state"/>.
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        private static (string, string) ParseVariable(State state) {
+            Debug.Assert(state != null);
+            if (!ScanWhiteSpaces(state, BibTexTokenType.Letter, true)) {
+                throw new FormatException(string.Format(
+                    Resources.ErrorInvalidVariableNameBegin,
+                    state.CurrentCharacter));
+            }
+
+            var key = ParseIdentifier(state, BibTexTokenType.WhiteSpace,
+                BibTexTokenType.Equals);
+
+            // TODO: what else is illegal for the key?
+            if (string.IsNullOrEmpty(key)) {
+                throw new FormatException(Resources.ErrorEmptyVariableName);
+            }
+
+            ScanWhiteSpaces(state, BibTexTokenType.Equals, true);
+            state.MoveNext();
+            ScanWhiteSpaces(state, BibTexTokenType.Equals, true);
+
+            // TODO: can variables be concatenated themselves?
+            var value = ParseQuotedString(state).ToString();
+
+            state.Variables.Add(key, value);
+            return (key, value);
         }
 
         #region Methods for skipping whole ranges of tokens

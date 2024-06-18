@@ -4,6 +4,8 @@
 // </copyright>
 // <author>Christoph Müller</author>
 
+using System.Collections.Generic;
+
 
 namespace Visus.BibTex {
 
@@ -22,5 +24,10 @@ namespace Visus.BibTex {
         /// parser will create a new builder on its own.
         /// </remarks>
         public IBibItemBuilder<TBibItem>? Builder { get; set; }
+
+        /// <summary>
+        /// Gets a set of string variables that are injected into the parser.
+        /// </summary>
+        public Dictionary<string, string> Variables { get; } = new();
     }
 }
