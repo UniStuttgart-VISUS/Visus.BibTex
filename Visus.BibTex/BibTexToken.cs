@@ -4,6 +4,8 @@
 // </copyright>
 // <author>Christoph Müller</author>
 
+using System.Diagnostics;
+
 
 namespace Visus.BibTex {
 
@@ -13,6 +15,7 @@ namespace Visus.BibTex {
     /// </summary>
     /// <param name="type">The semantic of the token.</param>
     /// <param name="character">The character that has been read.</param>
+    [DebuggerDisplay("{Type}: {Character}")]
     internal struct BibTexToken(BibTexTokenType type, char character) {
 
         #region Public properties

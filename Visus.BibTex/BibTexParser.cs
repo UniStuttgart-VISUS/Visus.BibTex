@@ -339,6 +339,10 @@ namespace Visus.BibTex {
                     state.MoveNext();
                 }
 
+                // Skip trailing spaces after comma such that the parser is on
+                // the next field or closing brace.
+                ScanWhiteSpaces(state, true);
+
                 // Technically, we would need to check here that we are
                 // at the end of the entry if the current token is not a
                 // comma. However, not doing so makes the parser more lenient,

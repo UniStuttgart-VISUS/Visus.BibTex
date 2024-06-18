@@ -21,15 +21,17 @@ namespace Visus.BibTex {
         /// <summary>
         /// Initialises a new instance.
         /// </summary>
-        /// <param name="type">The type of the item, which is typically one of
+        /// <param name="entryType">The type of the item, which is typically one of
         /// the constants in <see cref="WellKnownTypes"/>.</param>
         /// <param name="key">A unique key used to reference the item.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="type"/>
-        /// is <c>null</c>, or if <paramref name="key"/> is <c>null</c>.
-        /// </exception>
-        public BibItem(string type, string key) {
-            this.Key = key ?? throw new ArgumentNullException(nameof(key));
-            this.Type = type ?? throw new ArgumentNullException(nameof(type));
+        /// <exception cref="ArgumentNullException">If
+        /// <paramref name="entryType"/> is <c>null</c>, or if
+        /// <paramref name="key"/> is <c>null</c>.</exception>
+        public BibItem(string entryType, string key) {
+            this.Key = key
+                ?? throw new ArgumentNullException(nameof(key));
+            this.EntryType = entryType
+                ?? throw new ArgumentNullException(nameof(entryType));
             this._fields = new();
         }
         #endregion
@@ -123,6 +125,11 @@ namespace Visus.BibTex {
             get => this.GetField(WellKnownFields.Email);
             set => this.SetField(WellKnownFields.Email, value);
         }
+
+        /// <summary>
+        /// Gets the type of the entry.
+        /// </summary>
+        public string EntryType { get; }
 
         /// <summary>
         /// Gets or sets the institution responsible for the work, often for
@@ -227,9 +234,12 @@ namespace Visus.BibTex {
         }
 
         /// <summary>
-        /// Gets the type of the entry.
+        /// Gets or sets the specific type of a technical report or thesis.
         /// </summary>
-        public string Type { get; }
+        public string? Type {
+            get => this.GetField(WellKnownFields.Type);
+            set => this.SetField(WellKnownFields.Type, value);
+        }
 
         /// <summary>
         /// Gets or sets the volume of a book or journal, especially for

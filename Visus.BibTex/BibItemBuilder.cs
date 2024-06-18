@@ -45,8 +45,15 @@ namespace Visus.BibTex {
         }
 
         /// <inheritdoc />
-        public BibItem Build() => this._item
-            ?? throw new InvalidOperationException(Resources.ErrorNoItem);
+        public BibItem Build() {
+            if (this._item == null) {
+                throw new InvalidOperationException(Resources.ErrorNoItem);
+            }
+
+            var retval = this._item;
+            this._item = null;
+            return retval;
+        }
 
         /// <inheritdoc />
         public IBibItemBuilder<BibItem> Create(string type, string key) {

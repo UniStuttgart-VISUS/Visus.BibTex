@@ -20,7 +20,7 @@ namespace Visus.BibTex.Test {
         public void TestConstruction() {
             {
                 var item = new BibItem("article", "mueller:2024:test");
-                Assert.AreEqual("article", item.Type);
+                Assert.AreEqual("article", item.EntryType);
                 Assert.AreEqual("mueller:2024:test", item.Key);
             }
 

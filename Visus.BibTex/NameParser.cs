@@ -39,7 +39,7 @@ namespace Visus.BibTex {
             // are used to separate people or parts of the name. Note that the
             // maximum number of tokens we can buffer is limited, so it might be
             // that we need to decide on incomplete data after this loop.
-            while (cntBuffer < buffer.Length) {
+            while (cntBuffer < buffer.Length - 1) {
                 var token = tokeniser.Next();
                 buffer[cntBuffer++] = token;
 
