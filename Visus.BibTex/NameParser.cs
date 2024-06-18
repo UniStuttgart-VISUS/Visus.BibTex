@@ -306,6 +306,13 @@ namespace Visus.BibTex {
                         } else if (lastComma >= 0) {
                             ++literalsAfter;
                         }
+
+                        if (literalsAfter > maxLiteralsAfter) {
+                            maxLiteralsAfter = literalsAfter;
+                        }
+                        if (literalsBefore > maxLiteralsBefore) {
+                            maxLiteralsBefore = literalsBefore;
+                        }
                         break;
 
                     case NameTokenType.Separator:

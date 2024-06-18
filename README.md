@@ -78,3 +78,28 @@ Console.WriteLine(author.ToString("SCm"));
 ```
 
 The formats that can be combined are "S" for the surname, "C" for the Christian name, "M" for the middle names and "X" for a name suffix like "jr." All except for the suffix support abbreviation by specifying the lower-case variant.
+
+`Visus.BibTex.Name.Parse` also supports the opposite direction, i.e. parsing a string into a list of names:
+
+```C#
+var authors = Name.Parse("Ulbricht, Walter and Honecker, Erich");
+Console.Write(string.Join("; ", authors));
+
+// Expected console output:
+// Ulbricht, Walter; Honecker, Erich
+```
+
+The library makes best effort to recognise different formats of names, but it works best if authors are separated by the common "and":
+
+```C#
+var authors = Name.Parse("Walter Ulbricht  and Erich Honecker");
+Console.Write(string.Join("; ", authors));
+
+// Expected console output:
+// Ulbricht, Walter; Honecker, Erich
+
+// The following should yield the same outputs, but is more error-prone for
+// instance if surnames comprise of more than one token.
+var authors = Name.Parse("Walter Ulbricht, Erich Honecker");
+Console.Write(string.Join("; ", authors));
+```

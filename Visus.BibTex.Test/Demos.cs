@@ -49,6 +49,24 @@ namespace Visus.BibTex.Test {
                 Console.WriteLine(author.ToString("SCm"));
                 Assert.AreEqual("Ulbricht, Walter E. P.", author.ToString("SCm"));
             }
+
+            {
+                var authors = Name.Parse("Ulbricht, Walter and Honecker, Erich");
+                Console.Write(string.Join("; ", authors));
+                Assert.AreEqual("Ulbricht, Walter; Honecker, Erich", string.Join("; ", authors));
+            }
+
+            {
+                var authors = Name.Parse("Walter Ulbricht and Erich Honecker");
+                Console.Write(string.Join("; ", authors));
+                Assert.AreEqual("Ulbricht, Walter; Honecker, Erich", string.Join("; ", authors));
+            }
+
+            {
+                var authors = Name.Parse("Walter Ulbricht, Erich Honecker");
+                Console.Write(string.Join("; ", authors));
+                Assert.AreEqual("Ulbricht, Walter; Honecker, Erich", string.Join("; ", authors));
+            }
         }
 
         [TestMethod]
