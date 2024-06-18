@@ -321,7 +321,18 @@ namespace Visus.BibTex {
 
             while (state.CurrentTokenType != BibTexTokenType.BraceRight) {
                 var field = ParseField(state);
-                state.Builder.AddField(field.Item1, field.Item2);
+
+                switch (field.Item1) {
+                    case WellKnownFields.Author:
+                    case WellKnownFields.Editor:
+                        state.Builder.AddField(field.Item1,
+                            Name.Parse(field.Item2));
+                        break;
+
+                    default:
+                        state.Builder.AddField(field.Item1, field.Item2);
+                        break;
+                }
 
                 if (state.CurrentTokenType == BibTexTokenType.Comma) {
                     // Consume the trailing comma at the end of the entry.

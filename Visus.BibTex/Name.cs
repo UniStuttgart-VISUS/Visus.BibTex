@@ -27,49 +27,8 @@ namespace Visus.BibTex {
         /// </summary>
         /// <param name="name">The string to be parsed.</param>
         /// <returns>The names represented by the input string.</returns>
-        public static IEnumerable<Name> Parse(ReadOnlySpan<char> name) {
-            NameTokeniser tokeniser = new(name);
-            List<Name> retval = new();
-
-            var commaIsSeparator = false;
-            var haveSeparator = false;
-            var literalSequence = 0;            // # of subsequent literals.
-            var surname = new StringBuilder();
-
-            while (true) {
-                var token = tokeniser.Next();
-
-                switch (token.Type) {
-                    case NameTokenType.Comma:
-                        literalSequence = 0;
-                        break;
-
-                    case NameTokenType.End:
-                        return retval;
-
-                    case NameTokenType.Literal:
-                        if (Affixes.IsMatch(token.Text)) {
-                            surname.Append(token.Text);
-
-                        } else if (Suffixes.IsMatch(token.Text)) {
-
-                        }
-                        break;
-
-                    case NameTokenType.Separator:
-                        haveSeparator = true;
-                        literalSequence = 0;
-                        break;
-
-                    default:
-                        throw new NotImplementedException("An unexpected token "
-                            + "was encountered while parsing names. This is "
-                            + "a bug in Name.Parse(), which was not updated "
-                            + "to account for new tokens produced by the "
-                            + "tokeniser.");
-                }
-            }
-        }
+        public static IEnumerable<Name> Parse(ReadOnlySpan<char> name)
+            => NameParser.ParseList(name);
         #endregion
 
         #region Public constructors
@@ -310,20 +269,6 @@ namespace Visus.BibTex {
             middleNames = this.MiddleNames;
             suffix = this.Suffix;
         }
-        #endregion
-
-        #region Private constants
-        /// <summary>
-        /// These tokens are not considered individual names.
-        /// </summary>
-        private static readonly Regex Affixes = new("^(von|zu|van|der|den)$",
-            RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-        /// <summary>
-        /// These tokens are recognised as suffixes.
-        /// </summary>
-        private static readonly Regex Suffixes = new(@"^(jn?r\.?|sn?r\.?)$",
-            RegexOptions.Compiled | RegexOptions.IgnoreCase);
         #endregion
 
         #region Private fields

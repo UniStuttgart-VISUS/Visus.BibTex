@@ -19,13 +19,54 @@ namespace Visus.BibTex {
     [DebuggerDisplay("{Type}: {Text}")]
     internal ref struct NameToken(NameTokenType type, ReadOnlySpan<char> text) {
 
+        #region Public constructors
+        /// <summary>
+        /// Initialises a new instance with an <see cref="NameTokenType.End" />
+        /// token.
+        /// </summary>
+        public NameToken() : this(NameTokenType.End, new()) { }
+        #endregion
+
         #region Public properties
         /// <summary>
-        /// Answer whether the token starts with a capital letter.
+        /// Gets the first letter in <see cref="Text"/> or <c>null</c> if
+        /// <see cref="Text"/> is empty or does not contain any letter.
         /// </summary>
-        public bool IsCapitalised => (this.Text.Length > 0)
-            && (char.IsUpper(this.Text[0])
-            || UnicodeRanges.CjkUnifiedIdeographs.Contains(this.Text[0]));
+        public char? FirstLetter {
+            get {
+                foreach (var c in this.Text) {
+                    if (char.IsLetter(c)) {
+                        return c;
+                    }
+                }
+
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Answer whether the first letter in the token is a captial.
+        /// </summary>
+        public bool IsCapitalised {
+            get {
+                if (this.Text.Length < 1) {
+                    return false;
+                }
+
+                if (char.IsDigit(this.Text[0])) {
+                    return false;
+                }
+
+                var letter = this.FirstLetter;
+                if (letter == null) {
+                    return false;
+                }
+
+                var l = letter.Value;
+                return char.IsUpper(l)
+                    || UnicodeRanges.CjkUnifiedIdeographs.Contains(l);
+            }
+        }
 
         /// <summary>
         /// Gets the content of the token.
