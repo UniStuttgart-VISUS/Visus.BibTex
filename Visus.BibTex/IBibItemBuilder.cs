@@ -14,7 +14,19 @@ namespace Visus.BibTex {
     /// The interface of a builder that allows for constructing custom
     /// objects from BibTex input by the <see cref="BibTexParser{TBibItem}"/>.
     /// </summary>
-    /// <typeparam name="TBibItem"></typeparam>
+    /// <remarks>
+    /// <para>The <see cref="IBibItemBuilder{TBibItem}" /> is stateful. Once the
+    /// parser has obtained the type of an entry and the key, it will call
+    /// <see cref="Create(string, string)"/>. The builder should prepare a new
+    /// <see cref="TBibItem"/> internally and store the type and key.
+    /// Subsequently, the parser will call <see cref="AddField"/> for each field
+    /// it finds in the entry. At the end of the entry, it will retrieve the
+    /// item by calling <see cref="Build"/>. The builder is then free (and also
+    /// encouraged to) to release its internal copy of the item. The default
+    /// implementation in <see cref="BibItemBuilder"/> does this.</para>
+    /// </remarks>
+    /// <typeparam name="TBibItem">The type the BibTex entry is mapped to.
+    /// </typeparam>
     public interface IBibItemBuilder<TBibItem> {
 
         /// <summary>
