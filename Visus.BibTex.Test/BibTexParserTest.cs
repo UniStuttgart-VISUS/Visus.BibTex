@@ -933,9 +933,7 @@ namespace Visus.BibTex.Test {
 }
 """;
 
-            var options = new BibTexParserOptions<BibItem>() {
-                Builder = new BibItemBuilder()
-            };
+            var options = BibTexParserOptions.Create();
             options.Variables.Add("dec", "December");
             options.Variables.Add("mar", "March");
             options.Variables.Add("may", "May");

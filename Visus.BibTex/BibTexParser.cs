@@ -72,11 +72,7 @@ namespace Visus.BibTex {
                 BibTexParserOptions<TBibItem>? options = null)
                 where TBuilder : IBibItemBuilder<TBibItem>, new() {
             if (options == null) {
-                options = new();
-            }
-
-            if (options.Builder == null) {
-                options.Builder = new TBuilder();
+                options = new(new TBuilder());
             }
 
             return Parse(reader, options);
@@ -113,8 +109,8 @@ namespace Visus.BibTex {
             /// </summary>
             /// <param name="tokens"></param>
             public State(IEnumerable<BibTexToken> tokens,
-                    BibTexParserOptions<TBibItem>? options)
-                : this(tokens.GetEnumerator(), options ?? new()) { }
+                    BibTexParserOptions<TBibItem> options)
+                : this(tokens.GetEnumerator(), options) { }
 
             /// <summary>
             /// Gets the item builder.

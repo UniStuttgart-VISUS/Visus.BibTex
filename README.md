@@ -22,7 +22,7 @@ var bibtex = """
     publisher = "Field Museum of Natural History"
 }
 """;
-var item = BibTexParser<BibItem>.Parse<BibItemBuilder>(new StringReader(bibtex)).SingleOrDefault();
+var item = BibTexParser<BibItem>.Parse(new StringReader(bibtex), BibTexParserOptions.Create()).Single();
 ```
 
 
