@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -18,8 +19,17 @@ namespace Visus.BibTex {
     /// </summary>
     internal static class NameParser {
 
-        public static IEnumerable<Name> ParseList(ReadOnlySpan<char> name) {
-            NameTokeniser tokeniser = new(name);
+        /// <summary>
+        /// Parses <paramref name="names"/> as a list of one or more
+        /// <see cref="Name"/>s.
+        /// </summary>
+        /// <param name="names">The name string to parse.</param>
+        /// <returns>The list of names parsed from the input.</returns>
+        /// <exception cref="NotImplementedException">In case an internal
+        /// parsing error occurred that requires fixing of the code itself.
+        /// </exception>
+        public static IEnumerable<Name> ParseList(ReadOnlySpan<char> names) {
+            NameTokeniser tokeniser = new(names);
             List<Name> retval = new();
 
             var buffer = new NameTokenBuffer();     // Buffers for tokens.
@@ -59,55 +69,148 @@ namespace Visus.BibTex {
                 commaIsSeparator = false;
             }
 
-            var buffered = 0;               // Current token from buffer.
-            var current = (Name?) null;     // Current name.
-            var text = new StringBuilder(); // Accumulates all literal text.
+            var buffered = 0;                       // Current index in buffer.
+            var current = (Name?) null;             // Current name.
+            var literals = new List<string>();      // Potential names.
+            var suffixes = new StringBuilder();     // Suffixes of current.
+            var surname = new StringBuilder();      // Surname before comma.
+
+            // Commits the 'current' name to 'retval' and resets all other state
+            // variables to the begin of a new person.
+            var commit = () => {
+                if ((current == null) && (surname.Length > 0)) {
+                    // We have a surname (with affixes), but no entry for it
+                    // yet.
+                    current = new(surname.ToString());
+                }
+
+                if ((current == null) && literals.Any()) {
+                    // We have a bunch of names, but still no entry, so the last
+                    // token is the surname.
+                    current = new(literals.Last());
+                    literals.RemoveAt(literals.Count - 1);
+                }
+
+                if (current != null) {
+                    if (literals.Any()) {
+                        // The first remaining literal must be the christian
+                        // name.
+                        current.ChristianName = literals.First();
+                        literals.RemoveAt(0);
+                    }
+
+                    // Any remaining literal must be a middle name.
+                    current.MiddleNames = literals;
+
+                    if (suffixes.Length > 0) {
+                        // If we have suffixes, apply them. Otherwise, we want
+                        // the property to remain null rather than becoming an
+                        // empty string.
+                        current.Suffix = suffixes.ToString();
+                    }
+
+                    retval.Add(current);
+                    current = null;
+                }
+
+                // Do not clear the 'literals', but recreate them as the list
+                // now belongs to the entry we just emitted.
+                literals = new List<string>();
+
+                suffixes.Clear();
+            };
 
             while (true) {
                 // Obtain a new token, first by emptying the buffer and then by
                 // processing additional input.
                 var token = (buffered < cntBuffer)
-                    ? buffer[buffered]
+                    ? buffer[buffered++]
                     : tokeniser.Next();
-                ++buffered;
 
                 switch (token.Type) {
                     case NameTokenType.Comma:
                         if (commaIsSeparator == true) {
-                            // If the comma is the separator, we commit the
-                            // current name as if we had hit a separator.
-                            if (current != null) {
-                                retval.Add(current);
-                                current = null;
-                            }
+                            // If the comma is the separator, we just commit as
+                            // if we hit a separator.
+                            commit();
 
-                        } else if (commaIsSeparator == false) {
-                            // If the comma is not the separator, all buffered
-                            // stuff is now the surname of a new person.
-                            current = new(Accumulate(ref buffer,
-                                ref cntBuffer));
+                        } else if (surname.Length > 0) {
+                            // Comma is used to separate surname and Christian
+                            // name, but we have accumulated a surname with
+                            // affixes. Note that is important to clear the
+                            // 'surname' buffer to prevent further tokens being
+                            // accumulated as surname.
+                            current = new(surname.ToString());
+                            surname.Clear();
+
+                        } else {
+                            // Comma is used to separate surname and Christian
+                            // name and we reached the comma, so all tokens up
+                            // to here form the surname.
+                            current = new(string.Join(' ', literals));
+                            literals.Clear();
                         }
                         break;
 
                     case NameTokenType.End:
+                        commit();
                         return retval;
 
                     case NameTokenType.Literal:
-                        if (Affixes.IsMatch(token.Text)) {
-                            //surname.Append(token.Text);
+                        if (Suffixes.IsMatch(token.Text)) {
+                            // This is a known suffix, so do not include it as
+                            // a name, but accumulate the suffixes separately.
+                            suffixes.AppendSpaceIfNotEmpty();
+                            suffixes.Append(token.ToString());
 
-                        } else if (Suffixes.IsMatch(token.Text)) {
-                            //suffixes.AppendSpaceIfNotEmpty();
-                            //suffixes.Append(token.ToString());
+                        } else if ((commaIsSeparator == false)
+                                && ((surname.Length > 0)
+                                || Affixes.IsMatch(token.Text))) {
+                            // If we have emitted anything to the surname, all
+                            // the remainder except for the suffixes we tested
+                            // before must be part of the surname as well.
+                            // Furthermore, if we found any known affix used
+                            // with surnames, we also know that this must be
+                            // the start of the surname.
+                            surname.AppendSpaceIfNotEmpty();
+                            surname.Append(token.Text);
+
+                        } else {
+                            // In any other case, we collect the literal and
+                            // decide later.
+                            literals.Add(token.ToString());
                         }
+
+
+                        //} else {
+                        //    if (Suffixes.IsMatch(token.Text)) {
+                        //        // This is a known suffix, so do not include it
+                        //        // as part of the surname.
+                        //        suffixes.AppendSpaceIfNotEmpty();
+                        //        suffixes.Append(token.Text);
+
+                        //    } else if (current == null) {
+                        //        // We have no entry yet, so this token is part
+                        //        // of the surname.
+                        //        surname.AppendSpaceIfNotEmpty();
+                        //        surname.Append(token.Text);
+
+                        //    } else if (current.ChristianName == null) {
+                        //        // We have an entry but the Christian name has
+                        //        // not yet been set.
+                        //        current.ChristianName = token.ToString();
+
+                        //    } else {
+                        //        // This must be a middle name as we have the
+                        //        // surname and the Christian name already set
+                        //        // and the input does not match a suffix.
+                        //        literals.Add(token.ToString());
+                        //    }
+                        //}
                         break;
 
                     case NameTokenType.Separator:
-                        // If we are at a separator, we commit the current name.
-                        if (current != null) {
-                            retval.Add(current);
-                            current = null;
-                        }
+                        commit();
                         break;
 
                     default:
@@ -132,60 +235,12 @@ namespace Visus.BibTex {
         /// <summary>
         /// These tokens are recognised as suffixes.
         /// </summary>
-        private static readonly Regex Suffixes = new(@"^(jn?r\.?|sn?r\.?)$",
+        private static readonly Regex Suffixes = new(
+            @"^(jn?r\.?|sn?r\.?|[ivxlcdm]+\.?)$",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
         #endregion
 
         #region Private methods
-        /// <summary>
-        /// Accumulate at most <paramref name="cnt"/> buffered literals.
-        /// </summary>
-        /// <param name="buffer">The buffer from which to accumulate.</param>
-        /// <param name="cnt"> The number of valid tokens in
-        /// <paramref name="buffer"/>. The method will adjust this variable
-        /// (and the <paramref name="buffer"/>) to reflect all
-        /// <see cref="NameTokenType.Literal"/>s that have been consumed for
-        /// the return value.</param>
-        /// <returns>A string holding the text of all tokens until the first
-        /// non-literal.</returns>
-        private static string Accumulate(
-                ref NameTokenBuffer buffer,
-                ref int cnt) {
-            var retval = new StringBuilder();
-
-            if (cnt > buffer.Length) {
-                cnt = buffer.Length;
-            }
-
-            for (int i = 0; i < cnt; ++i) {
-                var t = buffer[i];
-
-                if (t.Type == NameTokenType.Literal) {
-                    if (!t.IsEmpty) {
-                        retval.AppendSpaceIfNotEmpty();
-                        retval.Append(t.Text);
-                    }
-
-                } else {
-                    // We found a non-literal token, so we shift the buffer
-                    // to reflect the stuff we have used before and bail out
-                    // early.
-                    var rem = cnt - i;
-                    Debug.Assert(rem > 0);
-
-                    for (int j = 0; j < rem; ++i, ++j) {
-                        buffer[j] = buffer[i];
-                    }
-
-                    cnt = rem;
-                    return retval.ToString();
-                }
-            }
-
-            cnt = 0;
-            return retval.ToString();
-        }
-
         /// <summary>
         /// Tries to find out based on the <paramref name="cnt"/> buffered
         /// <see cref="NameToken"/>s whether the comma is a separator between

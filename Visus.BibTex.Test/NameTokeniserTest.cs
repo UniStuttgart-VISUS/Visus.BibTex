@@ -75,7 +75,7 @@ namespace Visus.BibTex.Test {
             {
                 var token1 = tokeniser.Next();
                 Assert.AreEqual(NameTokenType.Literal, token1.Type);
-                Assert.AreEqual("Visualisierungsinstitut der Universität Stuttgart", token1.ToString());
+                Assert.AreEqual("{Visualisierungsinstitut der Universität Stuttgart}", token1.ToString());
             }
 
             {
@@ -117,7 +117,7 @@ namespace Visus.BibTex.Test {
             {
                 var token = tokeniser.Next();
                 Assert.AreEqual(NameTokenType.Literal, token.Type);
-                Assert.AreEqual("von Berlichingen zu Hornberg", token.ToString());
+                Assert.AreEqual("{von Berlichingen zu Hornberg}", token.ToString());
             }
 
             {
@@ -213,7 +213,7 @@ namespace Visus.BibTex.Test {
             {
                 var token = tokeniser.Next();
                 Assert.AreEqual(NameTokenType.Literal, token.Type);
-                Assert.AreEqual("{M}{\"u}ller-{L}{\"u}denscheidt", token.ToString());
+                Assert.AreEqual("{{M}{\"u}ller-{L}{\"u}denscheidt}", token.ToString());
             }
 
             {
@@ -232,7 +232,7 @@ namespace Visus.BibTex.Test {
             {
                 var token = tokeniser.Next();
                 Assert.AreEqual(NameTokenType.Literal, token.Type);
-                Assert.AreEqual("{M}{\"u}ller-{L}{\"u}denscheidt", token.ToString());
+                Assert.AreEqual("{{M}{\"u}ller-{L}{\"u}denscheidt}", token.ToString());
             }
 
             {
@@ -250,7 +250,7 @@ namespace Visus.BibTex.Test {
             {
                 var token = tokeniser.Next();
                 Assert.AreEqual(NameTokenType.Literal, token.Type);
-                Assert.AreEqual("Ulbricht", token.ToString());
+                Assert.AreEqual("{Ulbricht}", token.ToString());
             }
 
             {
@@ -316,7 +316,7 @@ namespace Visus.BibTex.Test {
             {
                 var token = tokeniser.Next();
                 Assert.AreEqual(NameTokenType.Literal, token.Type);
-                Assert.AreEqual("von Berlichingen zu Hornberg", token.ToString());
+                Assert.AreEqual("{von Berlichingen zu Hornberg}", token.ToString());
             }
 
             {

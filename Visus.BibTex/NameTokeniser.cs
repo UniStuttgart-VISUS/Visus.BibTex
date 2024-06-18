@@ -80,8 +80,7 @@ namespace Visus.BibTex {
                             // If we are not in a braced literal, a comma
                             // signals the end of the literal token, because
                             // the comma itself is a new token.
-                            return new(NameTokenType.Literal,
-                                this.Consume(i, true));
+                            return new(NameTokenType.Literal, this.Consume(i));
                         }
                         break;
 
@@ -90,15 +89,13 @@ namespace Visus.BibTex {
                             if (char.IsWhiteSpace(this._input[i])) {
                                 // We found a white space and are not in a braced
                                 // expression, which indicates the end of the token.
-                                return new(NameTokenType.Literal,
-                                    this.Consume(i, true));
+                                return new(NameTokenType.Literal, this.Consume(i));
                             }
 
                             if (this.CheckSeparators(i) > 0) {
                                 // We found a separator and are not in a braced
                                 // expression, which also marks a new token.
-                                return new(NameTokenType.Literal,
-                                    this.Consume(i, true));
+                                return new(NameTokenType.Literal, this.Consume(i));
                             }
                         }
 
@@ -109,7 +106,7 @@ namespace Visus.BibTex {
                 escaped = (this._input[i] == '\\');
             }
 
-            return new(NameTokenType.Literal, this.Consume(this._input.Length, true));
+            return new(NameTokenType.Literal, this.Consume(this._input.Length));
         }
         #endregion
 
@@ -148,30 +145,6 @@ namespace Visus.BibTex {
             Debug.Assert(this._input.Length >= length);
             var retval = this._input.Slice(0, length);
             this._input = this._input.Slice(length);
-            return retval;
-        }
-
-        /// <summary>
-        /// &quot;Consumes&quot; <paramref name="length"/> characters by
-        /// creating a new span as return value and setting the remainder as the
-        /// new value of <see cref="_input"/>. If the whole range defined
-        /// by <paramref name="length"/> is braced, remove the braces from the
-        /// output.
-        /// </summary>
-        /// <param name="length">The number of characters to consume.</param>
-        /// <param name="removeBraces">If <c>true</c>, braces around the whole
-        /// range will be removed. This does not affect inner braces, though.
-        /// </param>
-        /// <returns></returns>
-        private ReadOnlySpan<char> Consume(int length, bool removeBraces) {
-            var retval = this.Consume(length);
-
-            if (removeBraces
-                    && (retval[0] == '{')
-                    && (retval[retval.Length - 1] == '}')) {
-                retval = retval.Slice(1, retval.Length - 2);
-            }
-
             return retval;
         }
 
