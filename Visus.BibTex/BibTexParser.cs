@@ -79,10 +79,10 @@ namespace Visus.BibTex {
         }
 
         #region Nested class State
-            /// <summary>
-            /// Encapsulates the parser state such that we can pass it on to methods
-            /// we call.
-            /// </summary>
+        /// <summary>
+        /// Encapsulates the parser state such that we can pass it on to methods
+        /// we call.
+        /// </summary>
         private class State {
 
             /// <summary>
@@ -429,7 +429,7 @@ namespace Visus.BibTex {
             Debug.Assert(state != null);
 
             if ((tokens == null) || (tokens.Length < 1)) {
-                tokens = [ BibTexTokenType.WhiteSpace ];
+                tokens = [BibTexTokenType.WhiteSpace];
             }
 
             var retval = new StringBuilder();
@@ -502,18 +502,18 @@ namespace Visus.BibTex {
                         break;
 
                     case BibTexTokenType.Letter: {
-                        var name = ParseIdentifier(state,
-                            BibTexTokenType.WhiteSpace,
-                            BibTexTokenType.Comma);
-                        Debug.WriteLine($"Requested variable \"{name}\".");
-                        if (state.Variables.TryGetValue(name, out var value)) {
-                            retval.Append(value);
-                        } else {
-                            throw new FormatException(string.Format(
-                                Resources.ErrorUnknownVariable,
-                                name));
-                        }
-                        }break;
+                            var name = ParseIdentifier(state,
+                                BibTexTokenType.WhiteSpace,
+                                BibTexTokenType.Comma);
+                            Debug.WriteLine($"Requested variable \"{name}\".");
+                            if (state.Variables.TryGetValue(name, out var value)) {
+                                retval.Append(value);
+                            } else {
+                                throw new FormatException(string.Format(
+                                    Resources.ErrorUnknownVariable,
+                                    name));
+                            }
+                        } break;
 
                     default:
                         return retval.ToString();
@@ -590,12 +590,12 @@ namespace Visus.BibTex {
         /// </summary>
         /// <param name="state">The state object to advance.</param>
         /// <param name="token">The token up to which to advance.</param>
-        
+
         private static void ScanUntil(State state, BibTexTokenType token) {
             Debug.Assert(state != null);
             Debug.Assert(state.IsValid);
 
-            while ((state.CurrentTokenType != token) && state.MoveNext());
+            while ((state.CurrentTokenType != token) && state.MoveNext()) ;
 
             if (state.IsValid) {
                 Debug.Assert(state.CurrentToken.Type == token);
@@ -619,7 +619,7 @@ namespace Visus.BibTex {
             Debug.Assert(state != null);
             Debug.Assert(state.IsValid);
             while (state.CurrentToken.IsWhiteSpace(includeNewLine)
-                && state.MoveNext());
+                && state.MoveNext()) ;
         }
 
         /// <summary>
@@ -661,5 +661,23 @@ namespace Visus.BibTex {
         }
         #endregion
 
+    }
+
+
+    /// <summary>
+    /// The parser for the default <see cref="BibItem"/>.
+    /// </summary>
+    public static class BibTexParser {
+
+        /// <summary>
+        /// Uses <see cref="BibTexParser{TBibItem}"/> to parse the given
+        /// text as <see cref="BibItem"/>s.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static IEnumerable<BibItem> Parse(TextReader reader,
+                BibTexParserOptions<BibItem> options)
+            => BibTexParser<BibItem>.Parse(reader, options);
     }
 }

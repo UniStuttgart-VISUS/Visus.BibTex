@@ -67,6 +67,11 @@ namespace Visus.BibTex {
         /// Gets or sets whether the parser should put best effort into
         /// processing input that is syntactically not correct.
         /// </summary>
+        /// <remarks>
+        /// See documentation of
+        /// <see cref="BibTexParser{TBibItem}.Parse(System.IO.TextReader, BibTexParserOptions{TBibItem})"/>
+        /// for more information on what this flag affects.
+        /// </remarks>
         public bool Lenient { get; set; } = false;
 
         /// <summary>
@@ -98,6 +103,8 @@ namespace Visus.BibTex {
         /// <param name="builder">The builder creating and filling the items.
         /// </param>
         /// <returns>A new options object.</returns>
+        /// <exception cref="ArgumentNullException">If
+        /// <paramref name="builder"/> is <c>null</c>.</exception>
         public static BibTexParserOptions<TBibItem> Create<TBibItem>(
                 IBibItemBuilder<TBibItem> builder)
             => new BibTexParserOptions<TBibItem>(builder);
@@ -123,6 +130,8 @@ namespace Visus.BibTex {
         /// <param name="builder">The builder used to create new items. It is
         /// strongly discouraged to share this object between parsers.</param>
         /// <returns>A new options object.</returns>
+        /// <exception cref="ArgumentNullException">If
+        /// <paramref name="builder"/> is <c>null</c>.</exception>
         public static BibTexParserOptions<BibItem> Create(
                 IBibItemBuilder<BibItem> builder)
             => new BibTexParserOptions<BibItem>(builder);
