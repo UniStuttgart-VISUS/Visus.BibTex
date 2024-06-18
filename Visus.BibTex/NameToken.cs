@@ -49,7 +49,7 @@ namespace Visus.BibTex {
         /// </summary>
         public bool IsCapitalised {
             get {
-                if (this.Text.Length < 1) {
+                if (this.IsEmpty) {
                     return false;
                 }
 
@@ -67,6 +67,11 @@ namespace Visus.BibTex {
                     || UnicodeRanges.CjkUnifiedIdeographs.Contains(l);
             }
         }
+
+        /// <summary>
+        /// Gets whether the token contains no text.
+        /// </summary>
+        public bool IsEmpty => (this.Text.Length < 1);
 
         /// <summary>
         /// Gets the content of the token.

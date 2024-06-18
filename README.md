@@ -9,7 +9,7 @@ A library for parsing and manipulating BibTex entries in .NET 8+.
 The library provides a `Dictionary`-based implementation of a BibTex entry in the form of the [`Visus.BibTex.BibItem`](Visus.BibTex/BibItem.cs) class. However, callers can customise the parser to fill their own class by implementing [`Visus.BibTex.IBibItemBuilder`](Visus.BibTex/IBibItemBuilder.cs) for this class. [`Visus.BibTex.BibItemBuilder`](Visus.BibTex/BibItemBuilder.cs) is the reference implementation for the default item type.
 
 ### Authors and editors
-The library parses people into structured objects of type [`Visus.BibTex.Name`](Visus.BibTex/Name.cs). You can use these object to process the details of a name like this:
+The library parses people (`Visus.BibTex.WellKnownFields.Author` and `Visus.BibTex.WellKnownFields.Editor`) into structured objects of type [`Visus.BibTex.Name`](Visus.BibTex/Name.cs). You can use these object to process the details of a name like this:
 
 ```C#
 var author = new Name("Ulbricht", "Walter");
