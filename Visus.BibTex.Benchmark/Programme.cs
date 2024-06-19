@@ -9,3 +9,4 @@ using Visus.BibTex.Benchmark;
 
 
 BenchmarkRunner.Run<NameParser>();
+BenchmarkRunner.Run<BibItemParser>();
