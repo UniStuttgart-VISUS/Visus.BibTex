@@ -4,7 +4,30 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Title>VISUS BibTex</Title>
+    <Version>0.0.1</Version>
+    <Authors>Christoph Müller</Authors>
+    <Company>Visualisierungsinstitut der Universität Stuttgart</Company>
+    <Description>A library for parsing an manipulating BibTex entries.</Description>
+    <Copyright>Copyright © 2024 Visualisierungsinstitut der Universität Stuttgart</Copyright>
+    <PackageProjectUrl>https://github.com/UniStuttgart-VISUS/Visus.BibTex</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/UniStuttgart-VISUS/Visus.BibTex</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>bibtex</PackageTags>
+    <PackageReleaseNotes>Initial version of the library.</PackageReleaseNotes>
+    <NeutralLanguage>en</NeutralLanguage>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <IncludeSymbols>True</IncludeSymbols>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
