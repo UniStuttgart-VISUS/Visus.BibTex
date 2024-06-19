@@ -1,6 +1,7 @@
 # Visus.BibTex
 
 [![Build Status](https://visualisierungsinstitut.visualstudio.com/Visus.BibTex/_apis/build/status/UniStuttgart-VISUS.Visus.BibTex?branchName=master)](https://visualisierungsinstitut.visualstudio.com/Visus.BibTex/_build/latest?definitionId=9&branchName=master)
+[![Visus.BibTex](https://buildstats.info/nuget/Visus.BibTex)](https://www.nuget.org/packages/Visus.BibTex)
 
 A library for parsing and manipulating BibTex entries in .NET for use in Project Tiger.
 
@@ -44,9 +45,9 @@ Note that if multiple conflicting formats are specified, the last one will be ap
 
 ```C#
 var item = new BibItem(WellKnownTypes.InProceedings, "mueller:2022:power") {
-    Author = [ new("Müller", "Christoph"), new("Heinemann", "Moritz"), new("Weiskopf", "Daniel"), new("Ertl", "Thomas") ],
+    Author = [ new("MÃ¼ller", "Christoph"), new("Heinemann", "Moritz"), new("Weiskopf", "Daniel"), new("Ertl", "Thomas") ],
     Title = "Power Overwhelming: Quantifying the Energy Cost of Visualisation",
-    BookTitle = "Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)",
+    BookTitle = "Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond â€“ Methodological Approaches for Visualization (BELIV)",
     Month = "October",
     Year = "2022",
     Doi = "10.1109/BELIV57783.2022.00009",
@@ -58,8 +59,8 @@ Console.WriteLine(item);
 
 // Expected console output:
 // @inproceedings{mueller:2022:power,
-//    author = {Müller, Christoph and Heinemann, Moritz and Weiskopf, Daniel and Ertl, Thomas},
-//    booktitle = {Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)},
+//    author = {MÃ¼ller, Christoph and Heinemann, Moritz and Weiskopf, Daniel and Ertl, Thomas},
+//    booktitle = {Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond â€“ Methodological Approaches for Visualization (BELIV)},
 //    doi = {10.1109/BELIV57783.2022.00009},
 //    month = {October},
 //    pages = {38-46},
@@ -71,21 +72,21 @@ Console.WriteLine(item);
 Console.WriteLine(item.ToString("C"));
 
 // Expected console output:
-// @inproceedings{mueller:2022:power, author = {Müller, Christoph and Heinemann, Moritz and Weiskopf, Daniel and Ertl, Thomas}, booktitle = {Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)}, doi = {10.1109/BELIV57783.2022.00009}, month = {October}, pages = {38-46}, title = {Power Overwhelming: Quantifying the Energy Cost of Visualisation}, year = {2022}}
+// @inproceedings{mueller:2022:power, author = {MÃ¼ller, Christoph and Heinemann, Moritz and Weiskopf, Daniel and Ertl, Thomas}, booktitle = {Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond â€“ Methodological Approaches for Visualization (BELIV)}, doi = {10.1109/BELIV57783.2022.00009}, month = {October}, pages = {38-46}, title = {Power Overwhelming: Quantifying the Energy Cost of Visualisation}, year = {2022}}
 
 
 Console.WriteLine(item.ToString("cq"));
 
 // Expected console output:
-// @inproceedings{mueller:2022:power,author="Müller, Christoph and Heinemann, Moritz and Weiskopf, Daniel and Ertl, Thomas",booktitle="Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)",doi="10.1109/BELIV57783.2022.00009",month="October",pages="38-46",title="Power Overwhelming: Quantifying the Energy Cost of Visualisation",year="2022"}
+// @inproceedings{mueller:2022:power,author="MÃ¼ller, Christoph and Heinemann, Moritz and Weiskopf, Daniel and Ertl, Thomas",booktitle="Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond â€“ Methodological Approaches for Visualization (BELIV)",doi="10.1109/BELIV57783.2022.00009",month="October",pages="38-46",title="Power Overwhelming: Quantifying the Energy Cost of Visualisation",year="2022"}
 
 
 Console.WriteLine(item.ToString("s2q.cS"));
 
 // Expected console output:
 // @inproceedings{mueller:2022:power,
-//   author = "C. Müller and M. Heinemann and D. Weiskopf and T. Ertl",
-//   booktitle = "Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)",
+//   author = "C. MÃ¼ller and M. Heinemann and D. Weiskopf and T. Ertl",
+//   booktitle = "Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond â€“ Methodological Approaches for Visualization (BELIV)",
 //   doi = "10.1109/BELIV57783.2022.00009",
 //   month = "October",
 //   pages = "38-46",
@@ -172,11 +173,11 @@ Console.Write(string.Join("; ", authors));
 Note that the parser honours braces around names by not tokenising braced expressions:
 
 ```C#
-var authors = Name.Parse("{Visualisierungsinstitut der Universität Suttgart}");
+var authors = Name.Parse("{Visualisierungsinstitut der UniversitÃ¤t Suttgart}");
 Console.Write(string.Join("; ", authors));
 
 // Expected console output:
-// {Visualisierungsinstitut der Universität Suttgart}
+// {Visualisierungsinstitut der UniversitÃ¤t Suttgart}
 ```
 
 However, it will not remove the braces nor process any Latex instructions:
