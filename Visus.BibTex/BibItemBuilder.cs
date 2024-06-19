@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Visus.BibTex.Properties;
 
 
@@ -20,6 +19,7 @@ namespace Visus.BibTex {
     /// </summary>
     public sealed class BibItemBuilder : IBibItemBuilder<BibItem> {
 
+        #region Public methods
         /// <inheritdoc />
         public IBibItemBuilder<BibItem> AddField(string name,
                 string value) {
@@ -64,6 +64,7 @@ namespace Visus.BibTex {
             this._item = new(type, key);
             return this;
         }
+        #endregion
 
         #region Private methods
         /// <summary>

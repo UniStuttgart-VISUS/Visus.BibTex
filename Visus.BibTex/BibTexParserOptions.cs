@@ -85,10 +85,22 @@ namespace Visus.BibTex {
 
         #region Private fields
         private IBibItemBuilder<TBibItem> _builder;
-        private Dictionary<string, string> _variables = new();
+        private Dictionary<string, string> _variables = new() {
+            { "jan", "January" },
+            { "feb", "Feburary" },
+            { "mar", "March" },
+            { "apr", "April" },
+            { "may", "May" },
+            { "jun", "June" },
+            { "jul", "July" },
+            { "aug", "August" },
+            { "sep", "September" },
+            { "oct", "October" },
+            { "nov", "November" },
+            { "dec", "December" },
+        };
         #endregion
     }
-
 
     /// <summary>
     /// Provides factory methods for <see cref="BibTexParserOptions{TBibItem}"/>.

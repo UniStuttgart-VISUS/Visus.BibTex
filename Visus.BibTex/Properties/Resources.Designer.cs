@@ -185,5 +185,14 @@ namespace Visus.BibTex.Properties {
                 return ResourceManager.GetString("ErrorUnknownVariable", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An unmatched brace &quot;{0}&quot; was found in a string literal in line {1}..
+        /// </summary>
+        internal static string ErrorUnmatchedBraceInString {
+            get {
+                return ResourceManager.GetString("ErrorUnmatchedBraceInString", resourceCulture);
+            }
+        }
     }
 }

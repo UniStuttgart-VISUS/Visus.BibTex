@@ -26,6 +26,25 @@ namespace Visus.BibTex {
     /// the items of this type.</typeparam>
     public static class BibTexParser<TBibItem> {
 
+        // https://maverick.inria.fr/~Xavier.Decoret/resources/xdkbibtex/bibtex_summary.html
+        // https://www.bibtex.org/Format/
+        // https://bibtex.eu/
+
+        /// <summary>
+        /// Parses the text provided by <paramref name="reader"/> as BibTex.
+        /// </summary>
+        /// <remarks>
+        /// <para>The <paramref name="options"/> provide the ability to
+        /// configure <see cref="BibTexParserOptions{TBibItem}.Lenient"/>
+        /// behaviour, which has the following effects: First, if the parser
+        /// encounters a string variable that has not been defined, it will emit
+        /// the name of the variable as a literal. Second, if the parser
+        /// encounters an unmatched brace closing in a quoted string, it will
+        /// ignore this error and treat the brace as a normal character.</para>
+        /// </remarks>
+        /// <param name="reader"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
         public static IEnumerable<TBibItem> Parse(TextReader reader,
                 BibTexParserOptions<TBibItem> options) {
             var state = new State(BibTexLexer.Tokenise(reader), options);
@@ -44,9 +63,9 @@ namespace Visus.BibTex {
                         }
                         break;
 
-                    case BibTexTokenType.Percent:
-                        // This is a comment until the next line.
-                        ScanLine(state);
+                    default:
+                        // Everything outside an entry is ignored.
+                        state.MoveNext();
                         break;
                 }
             }
@@ -140,6 +159,12 @@ namespace Visus.BibTex {
             public bool IsValid { get; private set; }
 
             /// <summary>
+            /// Gets the current line number, which is automatically tracked by
+            /// <see cref="MoveNext"/>.
+            /// </summary>
+            public int Line { get; private set; } = 1;
+
+            /// <summary>
             /// Gets the parser options.
             /// </summary>
             public BibTexParserOptions<TBibItem> Options { get; }
@@ -160,6 +185,11 @@ namespace Visus.BibTex {
             /// <returns></returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool MoveNext() {
+                if (this.IsValid && (this.CurrentTokenType
+                        == BibTexTokenType.NewLine)) {
+                    ++this.Line;
+                }
+
                 this.IsValid = this._tokens.MoveNext();
 
                 if (this.IsValid) {
@@ -344,14 +374,14 @@ namespace Visus.BibTex {
                     state.MoveNext();
                 }
 
-                // Skip trailing spaces after comma such that the parser is on
-                // the next field or closing brace.
-                ScanWhiteSpaces(state, true);
-
                 // Technically, we would need to check here that we are
                 // at the end of the entry if the current token is not a
                 // comma. However, not doing so makes the parser more lenient,
                 // which is what we want.
+
+                // Skip trailing spaces after comma such that the parser is on
+                // the next field or closing brace.
+                ScanWhiteSpaces(state, true);
             }
 
             // Consume the closing brace.
@@ -398,7 +428,9 @@ namespace Visus.BibTex {
             ScanWhiteSpaces(state, true);
 
             // There are three valid kinds of fields: literal numbers, which may
-            // be without quotes, strings in quotes and strings in braces.
+            // be without quotes, strings in quotes and strings in braces. Note
+            // that we interpret a letter as the begin of a variable name here,
+            // which will be processed by the branch for quoted strings.
             var value = state.CurrentTokenType switch {
                 BibTexTokenType.Digit => ParseDigits(state),
                 BibTexTokenType.Quote => ParseQuotedStrings(state),
@@ -451,20 +483,45 @@ namespace Visus.BibTex {
             Debug.Assert(state != null);
             Debug.Assert(state.IsValid);
             Debug.Assert(state.CurrentTokenType == BibTexTokenType.Quote);
-            bool escaped = false;
+            var braces = 0;
+            var escaped = false;
             var retval = new StringBuilder();
 
             while (state.MoveNext()) {
                 switch (state.CurrentTokenType) {
-                    case BibTexTokenType.Backslash:
-                        escaped = true;
+                    case BibTexTokenType.BraceLeft:
+                        retval.Append(state.CurrentCharacter);
+
+                        if (!escaped) {
+                            ++braces;
+                        }
+                        break;
+
+                    case BibTexTokenType.BraceRight:
+                        retval.Append(state.CurrentCharacter);
+
+                        if (!escaped) {
+                            if (braces > 0) {
+                                --braces;
+
+                            } else if (!state.Options.Lenient) {
+                                // Unmatched braces in a string are illegal.
+                                throw new FormatException(string.Format(
+                                    Resources.ErrorUnmatchedBraceInString,
+                                    state.CurrentCharacter,
+                                    state.Line));
+                            }
+                        }
                         break;
 
                     case BibTexTokenType.Quote:
-                        if (escaped) {
-                            escaped = false;
+                        if (braces > 0) {
+                            // If we are in a braced expression, quotes are
+                            // escaped in a quoted string.
                             retval.Append(state.CurrentCharacter);
+
                         } else {
+                            // Otherwise, this marks the end of the string.
                             state.MoveNext();
                             return retval;
                         }
@@ -475,6 +532,9 @@ namespace Visus.BibTex {
                         retval.Append(state.CurrentCharacter);
                         break;
                 }
+
+                // Remember whether we are escaped for the next iteration.
+                escaped = (state.CurrentTokenType == BibTexTokenType.Backslash);
             }
 
             throw new FormatException(Resources.ErrorPrematureEnd);
@@ -508,6 +568,12 @@ namespace Visus.BibTex {
                             Debug.WriteLine($"Requested variable \"{name}\".");
                             if (state.Variables.TryGetValue(name, out var value)) {
                                 retval.Append(value);
+
+                            } else if (state.Options.Lenient) {
+                                Debug.WriteLine("Emitting missing variable "
+                                    + $"name \"{name}\" as literal string.");
+                                retval.Append(name);
+
                             } else {
                                 throw new FormatException(string.Format(
                                     Resources.ErrorUnknownVariable,

@@ -159,4 +159,7 @@
   <data name="ErrorUnknownVariable" xml:space="preserve">
     <value>The variable "{0}" was not found in the BibTex file or has not been injected via parser options.</value>
   </data>
+  <data name="ErrorUnmatchedBraceInString" xml:space="preserve">
+    <value>An unmatched brace "{0}" was found in a string literal in line {1}.</value>
+  </data>
 </root>
