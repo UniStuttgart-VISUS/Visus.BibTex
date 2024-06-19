@@ -74,13 +74,13 @@ Console.WriteLine(item.ToString("C"));
 Console.WriteLine(item.ToString("s2q.cS"));
 // Expected output:
 // @inproceedings{mueller:2022:power,
-//  author = "C. Müller and M. Heinemann and D. Weiskopf and T. Ertl",
-//  booktitle = "Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)",
-//  doi = "10.1109/BELIV57783.2022.00009",
-//  month = "October",
-//  pages = "38-46",
-//  title = "Power Overwhelming: Quantifying the Energy Cost of Visualisation",
-//  year = "2022"
+//   author = "C. Müller and M. Heinemann and D. Weiskopf and T. Ertl",
+//   booktitle = "Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)",
+//   doi = "10.1109/BELIV57783.2022.00009",
+//   month = "October",
+//   pages = "38-46",
+//   title = "Power Overwhelming: Quantifying the Energy Cost of Visualisation",
+//   year = "2022"
 //}
 ```
 
