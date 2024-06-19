@@ -114,7 +114,7 @@ namespace Visus.BibTex.Test {
         [TestMethod]
         public void BibTexFormatting() {
             var item = new BibItem(WellKnownTypes.InProceedings, "mueller:2022:power") {
-                Author = [new Name("Müller", "Christoph"), new Name("Heinemann", "Moritz"), new Name("Weiskopf", "Daniel"), new Name("Ertl", "Thomas")],
+                Author = [ new("Müller", "Christoph"), new("Heinemann", "Moritz"), new("Weiskopf", "Daniel"), new("Ertl", "Thomas") ],
                 Title = "Power Overwhelming: Quantifying the Energy Cost of Visualisation",
                 BookTitle = "Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)",
                 Month = "October",
