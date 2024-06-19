@@ -39,6 +39,8 @@ namespace Visus.BibTex {
                     '=' => BibTexTokenType.Equals,
                     '#' => BibTexTokenType.Hash,
                     '\n' => BibTexTokenType.NewLine,
+                    '(' => BibTexTokenType.ParenthesisLeft,
+                    ')' => BibTexTokenType.ParenthesisRight,
                     '%' => BibTexTokenType.Percent,
                     '"' => BibTexTokenType.Quote,
                     _ => char.IsLetter(c)

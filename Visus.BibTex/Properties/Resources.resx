@@ -127,7 +127,7 @@
     <value>An illegal "{0}" was found in line {1}".</value>
   </data>
   <data name="ErrorInvalidEntryBegin" xml:space="preserve">
-    <value>An opening brace was expected at the begin of the BibTex body instead of "{0}".</value>
+    <value>An opening brace was expected at the begin of the BibTex body instead of "{0}" in line {1}.</value>
   </data>
   <data name="ErrorInvalidEntryBuilt" xml:space="preserve">
     <value>The BibTex item builder has created an invalid item.</value>
@@ -144,11 +144,17 @@
   <data name="ErrorInvalidKeyEnd" xml:space="preserve">
     <value>A comma was expected after the key of the BibTex item instead of "{0}".</value>
   </data>
+  <data name="ErrorInvalidStringBegin" xml:space="preserve">
+    <value>An opening brace or parenthesis instead of "{0}" was expected at the begin of the string definition line {1}.</value>
+  </data>
+  <data name="ErrorInvalidStringEnd" xml:space="preserve">
+    <value>A closing "{0}" was expected in line {2}, but "{1}" was found.</value>
+  </data>
   <data name="ErrorInvalidTypeBegin" xml:space="preserve">
     <value>An unexpected "{0}" was found at the begin of the BibTex type.</value>
   </data>
   <data name="ErrorInvalidVariableNameBegin" xml:space="preserve">
-    <value>An unexpected "{0}" was found at the begin of the name of a string variable.</value>
+    <value>An unexpected "{0}" was found at the begin of the name of a string variable in line {1}.</value>
   </data>
   <data name="ErrorMissingEquals" xml:space="preserve">
     <value>The name and the value of a field must be delimited by "=" instead of "{0}".</value>

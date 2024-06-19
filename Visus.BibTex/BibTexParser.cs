@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -342,31 +343,34 @@ namespace Visus.BibTex {
                 BibTexTokenType.Digit,
                 BibTexTokenType.Equals,
                 BibTexTokenType.Letter);
-            Debug.WriteLine($"BibTex type is \"{type}\".");
-
-            // The first non-white space character must be the opening brace.
-            if (!ScanWhiteSpacesAndThen(state, BibTexTokenType.BraceLeft, true)) {
-                throw new FormatException(string.Format(
-                    Resources.ErrorInvalidEntryBegin,
-                    state.CurrentCharacter));
-            }
-
-            state.CheckValid();
 
             // We normalise the type to be lower case to facilitate the
             // subsequent processing of comment and preabmble blocks and to
             // match our pre-defined constants used by clients of the library.
             type = type.ToLowerInvariant();
+            Debug.WriteLine($"BibTex type is \"{type}\".");
+
+            // If the type is a string definition, we accept a brace or
+            // parentheses, so we have a special case here.
+            if (type == "string") {
+                ParseVariable(state);
+                entry = default;
+                return false;
+            }
+
+            // The first non-white space character must be the opening brace.
+            if (!ScanWhiteSpacesAndThen(state, BibTexTokenType.BraceLeft, true)) {
+                throw new FormatException(string.Format(
+                    Resources.ErrorInvalidEntryBegin,
+                    state.CurrentCharacter,
+                    state.Line));
+            }
+
+            state.CheckValid();
 
             if (type is "comment" or "preamble") {
                 // This is a block to ignore, so we skip until its end.
                 ScanUntil(state, BibTexTokenType.BraceRight);
-                entry = default;
-                return false;
-
-            } else if (type == "string") {
-                // This is the definition of a variable.
-                ParseVariable(state);
                 entry = default;
                 return false;
             }
@@ -461,6 +465,7 @@ namespace Visus.BibTex {
             var name = ParseString(state, BibTexTokenType.Character,
                 BibTexTokenType.Digit,
                 BibTexTokenType.Letter);
+            name = name.ToLowerInvariant();
             Debug.WriteLine($"Field \"{name}\" was found.");
 
             // The next non-white space must be the equals sign.
@@ -642,6 +647,10 @@ namespace Visus.BibTex {
                         }
                         } break;
 
+                    case BibTexTokenType.WhiteSpace:
+                        ScanWhiteSpaces(state, true);
+                        break;
+
                     default:
                         return retval.ToString();
                 }
@@ -674,32 +683,41 @@ namespace Visus.BibTex {
         /// </summary>
         /// <param name="state"></param>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static (string, string) ParseVariable(State state) {
             Debug.Assert(state != null);
-            if (!ScanWhiteSpaces(state, BibTexTokenType.Letter, true)) {
-                throw new FormatException(string.Format(
-                    Resources.ErrorInvalidVariableNameBegin,
-                    state.CurrentCharacter));
-            }
 
-            var key = ParseIdentifier(state, BibTexTokenType.WhiteSpace,
-                BibTexTokenType.Equals);
+            ScanWhiteSpaces(state, true);
 
-            // TODO: what else is illegal for the key?
-            if (string.IsNullOrEmpty(key)) {
-                throw new FormatException(Resources.ErrorEmptyVariableName);
-            }
+            var expectedEnd = state.CurrentTokenType switch {
+                BibTexTokenType.BraceLeft => BibTexTokenType.BraceRight,
+                BibTexTokenType.ParenthesisLeft => BibTexTokenType.ParenthesisRight,
+                _ => throw new FormatException(string.Format(
+                    Resources.ErrorInvalidStringBegin,
+                    state.CurrentCharacter,
+                    state.Line))
+            };
 
-            ScanWhiteSpaces(state, BibTexTokenType.Equals, true);
+            // Skip the opening brace or parenthesis and parse as field.
             state.MoveNext();
-            ScanWhiteSpaces(state, BibTexTokenType.Equals, true);
+            var retval = ParseField(state);
 
-            // TODO: we also need to replace variables in variable definitions
-            // TODO: can variables be concatenated themselves?
-            var value = ParseQuotedString(state).ToString();
+            ScanWhiteSpaces(state, true);
 
-            state.Variables.Add(key, value);
-            return (key, value);
+            if (state.CurrentTokenType != expectedEnd) {
+                throw new FormatException(string.Format(
+                    Resources.ErrorInvalidStringEnd,
+                    expectedEnd,
+                    state.CurrentCharacter,
+                    state.Line));
+            }
+
+            // As https://maverick.inria.fr/~Xavier.Decoret/resources/xdkbibtex/bibtex_summary.html
+            // states that for duplicate definitions, the last is kept, we just
+            // override the key here.
+            state.Variables[retval.Item1] = retval.Item2;
+
+            return retval;
         }
 
         #region Methods for skipping whole ranges of tokens

@@ -1020,7 +1020,6 @@ namespace Visus.BibTex.Test {
             }
         }
 
-
         [TestMethod]
         public void TestInriaBracedStringSample() {
             // Test samples from https://maverick.inria.fr/~Xavier.Decoret/resources/xdkbibtex/bibtex_summary.html
@@ -1043,6 +1042,60 @@ namespace Visus.BibTex.Test {
                     Assert.IsNotNull(item);
                     Assert.AreEqual("The history of @ sign", item.Title);
                 }
+            }
+        }
+
+        [TestMethod]
+        public void TestInriaStringSample() {
+            {
+                var bibtex = """
+@String(mar = "march")
+
+@Book{sweig42,
+  Author = { Stefan Sweig },
+  title = { The impossible book },
+  publisher = { Dead Poet Society},
+  year = 1942,
+  month = mar
+}
+""";
+                var item = BibTexParser.Parse(new StringReader(bibtex)).SingleOrDefault();
+                Assert.IsNotNull(item);
+                Assert.AreEqual("march", item.Month);
+            }
+
+            {
+                var bibtex = """
+@String{mar = "march"}
+
+@Book{sweig42,
+  Author = { Stefan Sweig },
+  title = { The impossible book },
+  publisher = { Dead Poet Society},
+  year = 1942,
+  month = mar
+}
+""";
+                var item = BibTexParser.Parse(new StringReader(bibtex)).SingleOrDefault();
+                Assert.IsNotNull(item);
+                Assert.AreEqual("march", item.Month);
+            }
+
+            {
+                var bibtex = """
+@String {firstname = "Xavier"}
+@String {lastname  = "Decoret"}
+@String {email      = firstname # "." # lastname # "@imag.fr"}
+
+@Misc{x,
+  Author = lastname # "," # firstname,
+  Email = email,
+}
+""";
+                var item = BibTexParser.Parse(new StringReader(bibtex)).SingleOrDefault();
+                Assert.IsNotNull(item);
+                Assert.AreEqual("Decoret, Xavier", item.Author!.Single().ToString("SC"));
+                Assert.AreEqual("Xavier.Decoret@imag.fr", item["email"]);
             }
         }
     }

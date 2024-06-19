@@ -69,14 +69,24 @@ namespace Visus.BibTex {
         NewLine,
 
         /// <summary>
-        /// A double quote.
+        /// An opening parenthesis.
         /// </summary>
-        Quote,
+        ParenthesisLeft,
+
+        /// <summary>
+        /// A closing parenthesis.
+        /// </summary>
+        ParenthesisRight,
 
         /// <summary>
         /// The percent sign, which is comment until the end of the line.
         /// </summary>
         Percent,
+
+        /// <summary>
+        /// A double quote.
+        /// </summary>
+        Quote,
 
         /// <summary>
         /// Any white-space character.

@@ -88,7 +88,7 @@ namespace Visus.BibTex.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An opening brace was expected at the begin of the BibTex body instead of &quot;{0}&quot;..
+        ///   Looks up a localized string similar to An opening brace was expected at the begin of the BibTex body instead of &quot;{0}&quot; in line {1}..
         /// </summary>
         internal static string ErrorInvalidEntryBegin {
             get {
@@ -142,6 +142,24 @@ namespace Visus.BibTex.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An opening brace or parenthesis instead of &quot;{0}&quot; was expected at the begin of the string definition line {1}..
+        /// </summary>
+        internal static string ErrorInvalidStringBegin {
+            get {
+                return ResourceManager.GetString("ErrorInvalidStringBegin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A closing &quot;{0}&quot; was expected in line {2}, but &quot;{1}&quot; was found..
+        /// </summary>
+        internal static string ErrorInvalidStringEnd {
+            get {
+                return ResourceManager.GetString("ErrorInvalidStringEnd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An unexpected &quot;{0}&quot; was found at the begin of the BibTex type..
         /// </summary>
         internal static string ErrorInvalidTypeBegin {
@@ -151,7 +169,7 @@ namespace Visus.BibTex.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An unexpected &quot;{0}&quot; was found at the begin of the name of a string variable..
+        ///   Looks up a localized string similar to An unexpected &quot;{0}&quot; was found at the begin of the name of a string variable in line {1}..
         /// </summary>
         internal static string ErrorInvalidVariableNameBegin {
             get {
