@@ -278,5 +278,53 @@ namespace Visus.BibTex.Test {
                 Assert.AreEqual(item.ToString("s1q.SC"), formatted);
             }
         }
+
+        [TestMethod]
+        public void TestFormatEscape() {
+            {
+                BibItem item = new(WellKnownTypes.Unpublished, "dowel");
+                item.Title = "Gedübel @ VISUS";
+
+                {
+                    var formatted = item.ToString();
+                    Assert.IsTrue(formatted.Contains("Gedübel \\@ VISUS"));
+                }
+
+                {
+                    var formatted = item.ToString("q");
+                    Assert.IsTrue(formatted.Contains("Gedübel @ VISUS"));
+                }
+            }
+
+            {
+                BibItem item = new(WellKnownTypes.Unpublished, "crowbar");
+                item.Title = "\"Crowbaring\" bei \"VISUS\"";
+
+                {
+                    var formatted = item.ToString();
+                    Assert.IsTrue(formatted.Contains("\"Crowbaring\" bei \"VISUS\""));
+                }
+
+                {
+                    var formatted = item.ToString("q");
+                    Assert.IsTrue(formatted.Contains("{\"}Crowbaring{\"} bei {\"}VISUS{\"}"));
+                }
+            }
+
+            {
+                BibItem item = new(WellKnownTypes.Unpublished, "crowbar");
+                item.Title = "{\"Crowbaring\" bei \"VISUS\"}";
+
+                {
+                    var formatted = item.ToString();
+                    Assert.IsTrue(formatted.Contains("{\"Crowbaring\" bei \"VISUS\"}"));
+                }
+
+                {
+                    var formatted = item.ToString("q");
+                    Assert.IsTrue(formatted.Contains("{\"Crowbaring\" bei \"VISUS\"}"));
+                }
+            }
+        }
     }
 }

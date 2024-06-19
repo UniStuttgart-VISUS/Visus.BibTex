@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 
 
@@ -302,7 +303,7 @@ namespace Visus.BibTex {
             // Split the format for the entry from the format for the names.
             var entryFormat = ((splitPos != null) && (splitPos >= 0))
                 ? format!.Substring(0, splitPos.Value)
-                : "s4";
+                : format;
             var nameFormat = ((splitPos != null) && (splitPos >= 0))
                 ? format!.Substring(splitPos.Value + 1)
                 : NameFormats.SurnamesSuffixChristianNameMiddleNames;
@@ -383,6 +384,7 @@ namespace Visus.BibTex {
             foreach (var f in this._fields.Keys.OrderBy(f => f)) {
                 var value = this[f];
                 if (value == null) {
+                    // Skip fields without a value.
                     continue;
                 }
 
@@ -406,11 +408,12 @@ namespace Visus.BibTex {
                             retval.Append(" and ");
                         }
 
-                        retval.Append(n.ToString(nameFormat));
+                        var s = EscapeField(n.ToString(nameFormat), quoted);
+                        retval.Append(s);
                     }
 
                 } else {
-                    retval.Append(value);
+                    retval.Append(EscapeField(value.ToString()!, quoted));
                 }
 
                 if (quoted) {
@@ -430,6 +433,63 @@ namespace Visus.BibTex {
 
         /// <inheritdoc />
         public override string ToString() => this.ToString(null, null);
+        #endregion
+
+        #region Private class methods
+        /// <summary>
+        /// Escapes the field value <paramref name="str"/> for braced or quoted
+        /// fields.
+        /// </summary>
+        /// <param name="str">The string to be escaped.</param>
+        /// <param name="quoted"><c>true</c> to assume a quoted string,
+        /// <c>false</c> for braced ones.</param>
+        /// <returns>The escaped string.</returns>
+        private static string EscapeField(string str, bool quoted) {
+            if (string.IsNullOrWhiteSpace(str)) {
+                return str;
+            }
+
+            var retval = new StringBuilder(str);
+
+            if (quoted) {
+                // If we are in a quoted string, quotes must be in braces.
+                int braces = 0;
+
+                for (int i = 0; i < retval.Length; ++i) {
+                    switch (retval[i]) {
+                        case '{':
+                            ++braces;
+                            break;
+
+                        case '}':
+                            if (braces > 0) {
+                                --braces;
+                            }
+                            break;
+
+                        case '"':
+                            if (braces < 1) {
+                                retval.Insert(i++, '{');
+                                retval.Insert(++i, '}');
+                            }
+                            break;
+                    }
+                }
+
+            } else {
+                // If we are in a braced string, it is illegal to have a
+                // non-escaped @ sign.
+                for (int i = 0; i < retval.Length; ++i) {
+                    if (retval[i] == '@') {
+                        if ((i == 0) || (retval[i - 1] != '\\')) {
+                            retval.Insert(i++, '\\');
+                        }
+                    }
+                }
+            }
+
+            return (retval.Length == str.Length) ? str : retval.ToString();
+        }
         #endregion
 
         #region Private methods
