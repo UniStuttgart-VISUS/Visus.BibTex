@@ -40,7 +40,49 @@ The `BibItem` allows for conversion to custom strings via `IFormattable`. The fo
 | tN            | Places each field in a separate line and indents it with N tabs if N is an integer number. If N is omitted or less than one, one tab will be used. |
 | q             | Uses quotes instead of braces for enclosing the fields. This modifier can be combined with any format. |
 
-Note that if multiple conflicting formats are specified, the last one will be applied, i.e. "ts4" will use four spaces for indentation.
+Note that if multiple conflicting formats are specified, the last one will be applied, i.e. "ts4" will use four spaces for indentation. The following example illustrates several formatting options:
+
+```C#
+var item = new BibItem(WellKnownTypes.InProceedings, "mueller:2022:power") {
+    Author = [new Name("Müller", "Christoph"), new Name("Heinemann", "Moritz"), new Name("Weiskopf", "Daniel"), new Name("Ertl", "Thomas")],
+    Title = "Power Overwhelming: Quantifying the Energy Cost of Visualisation",
+    BookTitle = "Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)",
+    Month = "October",
+    Year = "2022",
+    Doi = "10.1109/BELIV57783.2022.00009",
+    Pages = "38-46"
+};
+
+Console.WriteLine(item);
+
+// Expected output:
+// @inproceedings{mueller:2022:power,
+//    author = {Müller, Christoph and Heinemann, Moritz and Weiskopf, Daniel and Ertl, Thomas},
+//    booktitle = {Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)},
+//    doi = {10.1109/BELIV57783.2022.00009},
+//    month = {October},
+//    pages = {38-46},
+//    title = {Power Overwhelming: Quantifying the Energy Cost of Visualisation},
+//    year = {2022}
+// }
+
+Console.WriteLine(item.ToString("C"));
+
+// Expected output:
+// "@inproceedings{mueller:2022:power, author = {Müller, Christoph and Heinemann, Moritz and Weiskopf, Daniel and Ertl, Thomas}, booktitle = {Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)}, doi = {10.1109/BELIV57783.2022.00009}, month = {October}, pages = {38-46}, title = {Power Overwhelming: Quantifying the Energy Cost of Visualisation}, year = {2022}}"
+
+Console.WriteLine(item.ToString("s2q.cS"));
+// Expected output:
+// @inproceedings{mueller:2022:power,
+//  author = "C. Müller and M. Heinemann and D. Weiskopf and T. Ertl",
+//  booktitle = "Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)",
+//  doi = "10.1109/BELIV57783.2022.00009",
+//  month = "October",
+//  pages = "38-46",
+//  title = "Power Overwhelming: Quantifying the Energy Cost of Visualisation",
+//  year = "2022"
+//}
+```
 
 ### Authors and editors
 The library parses people (`Visus.BibTex.WellKnownFields.Author` and `Visus.BibTex.WellKnownFields.Editor`) into structured objects of type [`Visus.BibTex.Name`](Visus.BibTex/Name.cs). You can use these object to process the details of a name like this:
