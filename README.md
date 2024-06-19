@@ -53,6 +53,7 @@ var item = new BibItem(WellKnownTypes.InProceedings, "mueller:2022:power") {
     Pages = "38-46"
 };
 
+
 Console.WriteLine(item);
 
 // Expected output:
@@ -66,12 +67,21 @@ Console.WriteLine(item);
 //    year = {2022}
 // }
 
+
 Console.WriteLine(item.ToString("C"));
 
 // Expected output:
-// "@inproceedings{mueller:2022:power, author = {Müller, Christoph and Heinemann, Moritz and Weiskopf, Daniel and Ertl, Thomas}, booktitle = {Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)}, doi = {10.1109/BELIV57783.2022.00009}, month = {October}, pages = {38-46}, title = {Power Overwhelming: Quantifying the Energy Cost of Visualisation}, year = {2022}}"
+// @inproceedings{mueller:2022:power, author = {Müller, Christoph and Heinemann, Moritz and Weiskopf, Daniel and Ertl, Thomas}, booktitle = {Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)}, doi = {10.1109/BELIV57783.2022.00009}, month = {October}, pages = {38-46}, title = {Power Overwhelming: Quantifying the Energy Cost of Visualisation}, year = {2022}}
+
+
+Console.WriteLine(item.ToString("cq"));
+
+// Expected output:
+@inproceedings{mueller:2022:power,author="Müller, Christoph and Heinemann, Moritz and Weiskopf, Daniel and Ertl, Thomas",booktitle="Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)",doi="10.1109/BELIV57783.2022.00009",month="October",pages="38-46",title="Power Overwhelming: Quantifying the Energy Cost of Visualisation",year="2022"}
+
 
 Console.WriteLine(item.ToString("s2q.cS"));
+
 // Expected output:
 // @inproceedings{mueller:2022:power,
 //   author = "C. Müller and M. Heinemann and D. Weiskopf and T. Ertl",
