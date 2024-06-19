@@ -79,6 +79,15 @@ namespace Visus.BibTex.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An illegal &quot;{0}&quot; was found in line {1}&quot;..
+        /// </summary>
+        internal static string ErrorIllegalCharacter {
+            get {
+                return ResourceManager.GetString("ErrorIllegalCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An opening brace was expected at the begin of the BibTex body instead of &quot;{0}&quot;..
         /// </summary>
         internal static string ErrorInvalidEntryBegin {
@@ -169,7 +178,7 @@ namespace Visus.BibTex.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The end of the input was reached prematurely..
+        ///   Looks up a localized string similar to The end of the input was reached prematurely in line {1}..
         /// </summary>
         internal static string ErrorPrematureEnd {
             get {
@@ -178,7 +187,7 @@ namespace Visus.BibTex.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The variable &quot;{0}&quot; was not found in the BibTex file or has not been injected via parser options..
+        ///   Looks up a localized string similar to The variable &quot;{0}&quot; found in line {1} was not found in the BibTex file or has not been injected via parser options..
         /// </summary>
         internal static string ErrorUnknownVariable {
             get {

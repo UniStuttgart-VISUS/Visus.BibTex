@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Visus.BibTex.Properties;
@@ -40,7 +41,9 @@ namespace Visus.BibTex {
         /// encounters a string variable that has not been defined, it will emit
         /// the name of the variable as a literal. Second, if the parser
         /// encounters an unmatched brace closing in a quoted string, it will
-        /// ignore this error and treat the brace as a normal character.</para>
+        /// ignore this error and treat the brace as a normal character. Note
+        /// that the parser cannot easily ignore opening braces, because these
+        /// escape the quote character itself.</para>
         /// </remarks>
         /// <param name="reader"></param>
         /// <param name="options"></param>
@@ -180,6 +183,21 @@ namespace Visus.BibTex {
             public Dictionary<string, string> Variables { get; } = new();
 
             /// <summary>
+            /// Makes sure that the end of the input was not yet reached or
+            /// throws a <see cref="FormatException"/>.
+            /// </summary>
+            /// <exception cref="FormatException">If <see cref="IsValid"/> is
+            /// not <c>true</c>.</exception>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void CheckValid() {
+                if (!this.IsValid) {
+                    throw new FormatException(string.Format(
+                        Resources.ErrorPrematureEnd,
+                        this.Line));
+                }
+            }
+
+            /// <summary>
             /// Moves the iterator forward and updates the state accordingly.
             /// </summary>
             /// <returns></returns>
@@ -206,19 +224,6 @@ namespace Visus.BibTex {
         #endregion
 
         /// <summary>
-        /// Makes sure that <paramref name="state"/> has not reached the end or
-        /// throws a <see cref="FormatException"/>.
-        /// </summary>
-        /// <param name="state"></param>
-        /// <exception cref="FormatException"></exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void CheckValid(State state) {
-            if (!state.IsValid) {
-                throw new FormatException(Resources.ErrorPrematureEnd);
-            }
-        }
-
-        /// <summary>
         /// Parses a braced string.
         /// </summary>
         /// <param name="state"></param>
@@ -228,23 +233,49 @@ namespace Visus.BibTex {
             Debug.Assert(state != null);
             Debug.Assert(state.IsValid);
             Debug.Assert(state.CurrentTokenType == BibTexTokenType.BraceLeft);
-            int depth = 0;
+            int braces = 0;
+            var escaped = false;
             var retval = new StringBuilder();
 
             while (state.MoveNext()) {
                 switch (state.CurrentTokenType) {
+                    case BibTexTokenType.At:
+                        if (!escaped && !state.Options.Lenient) {
+                            throw new FormatException(string.Format(
+                                Resources.ErrorIllegalCharacter,
+                                state.Line));
+                        }
+
+                        retval.Append(state.CurrentCharacter);
+                        break;
+
                     case BibTexTokenType.BraceLeft:
-                        ++depth;
+                        if (!escaped) {
+                            ++braces;
+                        }
+
                         retval.Append(state.CurrentCharacter);
                         break;
 
                     case BibTexTokenType.BraceRight:
-                        if (depth > 0) {
-                            --depth;
+                        if (escaped) {
                             retval.Append(state.CurrentCharacter);
+
+                        } else if (braces > 0) {
+                            --braces;
+                            retval.Append(state.CurrentCharacter);
+
                         } else {
                             state.MoveNext();
-                            return retval.ToString();
+                            return retval.TrimEnd().ToString();
+                        }
+                        break;
+
+                    case BibTexTokenType.WhiteSpace:
+                        // If we encounter a white space and have not yet
+                        // emitted anything, we can trivially trim the string.
+                        if (retval.Length > 0) {
+                            retval.Append(state.CurrentCharacter);
                         }
                         break;
 
@@ -252,9 +283,13 @@ namespace Visus.BibTex {
                         retval.Append(state.CurrentCharacter);
                         break;
                 }
+
+                // Remember whether we are escaped for the next iteration.
+                escaped = (state.CurrentTokenType == BibTexTokenType.Backslash);
             }
 
-            throw new FormatException(Resources.ErrorPrematureEnd);
+            throw new FormatException(string.Format(Resources.ErrorPrematureEnd,
+                state.Line));
         }
 
         /// <summary>
@@ -280,14 +315,18 @@ namespace Visus.BibTex {
         /// </summary>
         /// <param name="state"></param>
         /// <param name="entry"></param>
-        /// <returns></returns>
+        /// <returns><c>true</c> if an <paramref name="entry"/> was emitted,
+        /// <c>false</c> if the entry was a special one like a comment or a
+        /// definition of a string variable.</returns>
         private static bool ParseEntry(State state,
                 [NotNullWhen(true)] out TBibItem? entry) {
             Debug.Assert(state != null);
             Debug.Assert(state.CurrentTokenType == BibTexTokenType.At);
 
             if (!state.MoveNext()) {
-                throw new FormatException(Resources.ErrorPrematureEnd);
+                throw new FormatException(string.Format(
+                    Resources.ErrorPrematureEnd,
+                    state.Line));
             }
 
             // The type of an entry must start with a letter.
@@ -312,7 +351,7 @@ namespace Visus.BibTex {
                     state.CurrentCharacter));
             }
 
-            CheckValid(state);
+            state.CheckValid();
 
             // We normalise the type to be lower case to facilitate the
             // subsequent processing of comment and preabmble blocks and to
@@ -322,6 +361,12 @@ namespace Visus.BibTex {
             if (type is "comment" or "preamble") {
                 // This is a block to ignore, so we skip until its end.
                 ScanUntil(state, BibTexTokenType.BraceRight);
+                entry = default;
+                return false;
+
+            } else if (type == "string") {
+                // This is the definition of a variable.
+                ParseVariable(state);
                 entry = default;
                 return false;
             }
@@ -347,7 +392,7 @@ namespace Visus.BibTex {
                     state.CurrentCharacter));
             }
 
-            CheckValid(state);
+            state.CheckValid();
             ScanWhiteSpaces(state, true);
 
             // Next, we parse the fields, for which we need to construct the
@@ -403,7 +448,7 @@ namespace Visus.BibTex {
         private static (string, string) ParseField(State state) {
             Debug.Assert(state != null);
 
-            CheckValid(state);
+            state.CheckValid();
 
             // The name of a field must start with a letter.
             if (!ScanWhiteSpaces(state, BibTexTokenType.Letter, false)) {
@@ -475,7 +520,7 @@ namespace Visus.BibTex {
         }
 
         /// <summary>
-        /// Parses a string in quotes.
+        /// Parses a single string in quotes.
         /// </summary>
         /// <param name="state"></param>
         /// <returns></returns>
@@ -493,6 +538,8 @@ namespace Visus.BibTex {
                         retval.Append(state.CurrentCharacter);
 
                         if (!escaped) {
+                            // If not escaped, count the quotes as they need to
+                            // be balanced.
                             ++braces;
                         }
                         break;
@@ -501,6 +548,8 @@ namespace Visus.BibTex {
                         retval.Append(state.CurrentCharacter);
 
                         if (!escaped) {
+                            // If not escaped, make sure that the quotes are
+                            // balanced.
                             if (braces > 0) {
                                 --braces;
 
@@ -537,11 +586,13 @@ namespace Visus.BibTex {
                 escaped = (state.CurrentTokenType == BibTexTokenType.Backslash);
             }
 
-            throw new FormatException(Resources.ErrorPrematureEnd);
+            throw new FormatException(string.Format(Resources.ErrorPrematureEnd,
+                state.Line));
         }
 
         /// <summary>
-        /// Parses a sequence of strings in quotes that are (potentially)
+        /// Parses a sequence of strings in quotes that contain
+        /// (potentially) string variables and are (potentially)
         /// concatenated using the hash operator.
         /// </summary>
         /// <param name="state"></param>
@@ -552,33 +603,43 @@ namespace Visus.BibTex {
             while (true) {
                 switch (state.CurrentTokenType) {
                     case BibTexTokenType.Quote:
+                        // If we are on a quote, parse the string that follows.
                         retval.Append(ParseQuotedString(state));
                         ScanWhiteSpaces(state, true);
                         break;
 
                     case BibTexTokenType.Hash:
+                        // If we are on a hash, we just eat it and continue to
+                        // concatenate the following tokens.
                         state.MoveNext();
                         ScanWhiteSpaces(state, true);
                         break;
 
                     case BibTexTokenType.Letter: {
-                            var name = ParseIdentifier(state,
-                                BibTexTokenType.WhiteSpace,
-                                BibTexTokenType.Comma);
-                            Debug.WriteLine($"Requested variable \"{name}\".");
-                            if (state.Variables.TryGetValue(name, out var value)) {
-                                retval.Append(value);
+                        // If we are on a letter, this is the identifier of a
+                        // string variable. We therefore try to replace it from
+                        // the table of variables.
+                        var name = ParseIdentifier(state,
+                            BibTexTokenType.WhiteSpace,
+                            BibTexTokenType.Comma);
+                        Debug.WriteLine($"Requested variable \"{name}\".");
 
-                            } else if (state.Options.Lenient) {
-                                Debug.WriteLine("Emitting missing variable "
-                                    + $"name \"{name}\" as literal string.");
-                                retval.Append(name);
+                        if (state.Variables.TryGetValue(name, out var value)) {
+                            Debug.WriteLine($"Replace variable \"{name}\" with "
+                                +$"value \"{value}\".");
+                            retval.Append(value);
 
-                            } else {
-                                throw new FormatException(string.Format(
-                                    Resources.ErrorUnknownVariable,
-                                    name));
-                            }
+                        } else if (state.Options.Lenient) {
+                            Debug.WriteLine("Emitting missing variable "
+                                + $"name \"{name}\" as literal string.");
+                            retval.Append(name);
+
+                        } else {
+                            throw new FormatException(string.Format(
+                                Resources.ErrorUnknownVariable,
+                                name,
+                                state.Line));
+                        }
                         } break;
 
                     default:
@@ -633,6 +694,7 @@ namespace Visus.BibTex {
             state.MoveNext();
             ScanWhiteSpaces(state, BibTexTokenType.Equals, true);
 
+            // TODO: we also need to replace variables in variable definitions
             // TODO: can variables be concatenated themselves?
             var value = ParseQuotedString(state).ToString();
 
@@ -726,7 +788,6 @@ namespace Visus.BibTex {
             return retval;
         }
         #endregion
-
     }
 
 
@@ -739,11 +800,24 @@ namespace Visus.BibTex {
         /// Uses <see cref="BibTexParser{TBibItem}"/> to parse the given
         /// text as <see cref="BibItem"/>s.
         /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
+        /// <param name="reader">The reader providing the input text.</param>
+        /// <param name="options">The parser options to use.</param>
+        /// <returns>The list of items parsed from the text.</returns>
+        /// <exception cref="ArgumentNullException">If
+        /// <paramref name="options"/> is <c>null</c>.</exception>
         public static IEnumerable<BibItem> Parse(TextReader reader,
                 BibTexParserOptions<BibItem> options)
             => BibTexParser<BibItem>.Parse(reader, options);
+
+        /// <summary>
+        /// Uses <see cref="BibTexParser{TBibItem}"/> to parse the given text
+        /// as <see cref="BibItem"/>s using default
+        /// <see cref="BibTexParser{TBibItem}"/>.
+        /// </summary>
+        /// <param name="reader">The reader providing the input text.</param>
+        /// <returns>The list of items parsed from the text.</returns>
+        public static IEnumerable<BibItem> Parse(TextReader reader)
+            => BibTexParser<BibItem>.Parse(reader,
+                BibTexParserOptions.Create());
     }
 }

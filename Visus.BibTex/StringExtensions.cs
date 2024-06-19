@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -118,6 +119,37 @@ namespace Visus.BibTex {
                 ? string.Empty
                 : that;
         }
+
+        /// <summary>
+        /// Trim characters from the end of a <see cref="StringBuilder"/>.
+        /// </summary>
+        /// <param name="that"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        internal static StringBuilder TrimEnd(this StringBuilder that,
+                Func<char, bool> predicate) {
+            if ((that == null) || (predicate == null)) {
+                return that!;
+            }
+
+            var index = that.Length - 1;
+            while ((index > 0) && predicate(that[index])) {
+                that.Remove(index, 1);
+                --index;
+            }
+
+            return that;
+        }
+
+        /// <summary>
+        /// Trims white-space characters from the end of a
+        /// <see cref="StringBuilder"/>.
+        /// </summary>
+        /// <param name="that"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static StringBuilder TrimEnd(this StringBuilder that)
+            => that.TrimEnd(char.IsWhiteSpace);
         #endregion
     }
 }

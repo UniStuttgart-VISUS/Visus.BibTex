@@ -950,7 +950,7 @@ namespace Visus.BibTex.Test {
 """;
 
                 Assert.ThrowsException<FormatException>(() => {
-                    BibTexParser.Parse(new StringReader(bibtex), BibTexParserOptions.Create()).SingleOrDefault();
+                    BibTexParser.Parse(new StringReader(bibtex)).SingleOrDefault();
                 });
             }
 
@@ -962,7 +962,7 @@ namespace Visus.BibTex.Test {
 """;
 
                 Assert.ThrowsException<FormatException>(() => {
-                    BibTexParser.Parse(new StringReader(bibtex), BibTexParserOptions.Create()).SingleOrDefault();
+                    BibTexParser.Parse(new StringReader(bibtex)).SingleOrDefault();
                 });
 
                 {
@@ -980,7 +980,7 @@ namespace Visus.BibTex.Test {
   title = "A {bunch {of} braces {in}} title"
 }
 """;
-                var item = BibTexParser.Parse(new StringReader(bibtex), BibTexParserOptions.Create()).SingleOrDefault();
+                var item = BibTexParser.Parse(new StringReader(bibtex)).SingleOrDefault();
                 Assert.IsNotNull(item);
                 Assert.AreEqual("A {bunch {of} braces {in}} title", item.Title);
             }
@@ -993,7 +993,7 @@ namespace Visus.BibTex.Test {
 """;
 
                 Assert.ThrowsException<FormatException>(() => {
-                    BibTexParser.Parse(new StringReader(bibtex), BibTexParserOptions.Create()).SingleOrDefault();
+                    BibTexParser.Parse(new StringReader(bibtex)).SingleOrDefault();
                 });
             }
 
@@ -1003,7 +1003,7 @@ namespace Visus.BibTex.Test {
   author = "Simon {"}the {saint"} Templar",
 }
 """;
-                var item = BibTexParser.Parse(new StringReader(bibtex), BibTexParserOptions.Create()).SingleOrDefault();
+                var item = BibTexParser.Parse(new StringReader(bibtex)).SingleOrDefault();
                 Assert.IsNotNull(item);
                 Assert.AreEqual("Simon {\"}the {saint\"} Templar", item.Author!.Single().ToString("CMS"));
             }
@@ -1014,9 +1014,35 @@ namespace Visus.BibTex.Test {
   title = "The history of @ sign"
 }
 """;
-                var item = BibTexParser.Parse(new StringReader(bibtex), BibTexParserOptions.Create()).SingleOrDefault();
+                var item = BibTexParser.Parse(new StringReader(bibtex)).SingleOrDefault();
                 Assert.IsNotNull(item);
                 Assert.AreEqual("The history of @ sign", item.Title);
+            }
+        }
+
+
+        [TestMethod]
+        public void TestInriaBracedStringSample() {
+            // Test samples from https://maverick.inria.fr/~Xavier.Decoret/resources/xdkbibtex/bibtex_summary.html
+            {
+                var bibtex = """
+@Article{key01,
+  title = { The history of @ sign }
+}
+""";
+
+                Assert.ThrowsException<FormatException>(() => {
+                    BibTexParser.Parse(new StringReader(bibtex)).SingleOrDefault();
+                });
+
+                {
+                    var options = BibTexParserOptions.Create();
+                    options.Lenient = true;
+
+                    var item = BibTexParser.Parse(new StringReader(bibtex), options).SingleOrDefault();
+                    Assert.IsNotNull(item);
+                    Assert.AreEqual("The history of @ sign", item.Title);
+                }
             }
         }
     }
