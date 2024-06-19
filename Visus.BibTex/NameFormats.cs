@@ -96,6 +96,13 @@ namespace Visus.BibTex {
             = $"{Surname}{ChristianName}{MiddleInitials}{Suffix}";
 
         /// <summary>
+        /// The surname followed by suffix, the christian name and the
+        /// initials of the middle names, if any.
+        /// </summary>
+        public const string SurnameSuffixChristianNameMiddleInitials
+            = $"{Surname}{Suffix}{ChristianName}{MiddleInitials}";
+
+        /// <summary>
         /// The surname followed by all Christian names.
         /// </summary>
         public const string SurnameChristianNameMiddleNames
@@ -106,5 +113,11 @@ namespace Visus.BibTex {
         /// </summary>
         public const string SurnameChristianNameMiddleNamesSuffix
             = $"{Surname}{ChristianName}{MiddleNames}{Suffix}";
+
+        /// <summary>
+        /// The surname followed by the suffix and all Christian names.
+        /// </summary>
+        public const string SurnamesSuffixChristianNameMiddleNames
+            = $"{Surname}{Suffix}{ChristianName}{MiddleNames}";
     }
 }

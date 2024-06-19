@@ -200,5 +200,83 @@ namespace Visus.BibTex.Test {
             Assert.IsTrue(item.ContainsField(WellKnownFields.Year));
             Assert.IsTrue(item.Any(f => f.Key == WellKnownFields.Year));
         }
+
+        [TestMethod]
+        public void TestFormat() {
+            var item = new BibItem(WellKnownTypes.InProceedings, "mueller:2022:power");
+            item.Author = [ new Name("Müller", "Christoph"), new Name("Heinemann", "Moritz"), new Name("Weiskopf", "Daniel"), new Name("Ertl", "Thomas") ];
+            item.Title = "Power Overwhelming: Quantifying the Energy Cost of Visualisation";
+            item.BookTitle = "Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)";
+            item.Month = "October";
+            item.Year = "2022";
+            item.Doi = "10.1109/BELIV57783.2022.00009";
+            item.Pages = "38-46";
+
+            {
+                var formatted = item.ToString("c.SC");
+                Assert.IsNotNull(formatted);
+                Assert.AreEqual("@inproceedings{mueller:2022:power,author={Müller, Christoph and Heinemann, Moritz and Weiskopf, Daniel and Ertl, Thomas},booktitle={Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)},doi={10.1109/BELIV57783.2022.00009},month={October},pages={38-46},title={Power Overwhelming: Quantifying the Energy Cost of Visualisation},year={2022}}", formatted);
+            }
+
+            {
+                var formatted = item.ToString("C.SC");
+                Assert.IsNotNull(formatted);
+                Assert.AreEqual("@inproceedings{mueller:2022:power, author = {Müller, Christoph and Heinemann, Moritz and Weiskopf, Daniel and Ertl, Thomas}, booktitle = {Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)}, doi = {10.1109/BELIV57783.2022.00009}, month = {October}, pages = {38-46}, title = {Power Overwhelming: Quantifying the Energy Cost of Visualisation}, year = {2022}}", formatted);
+            }
+
+            {
+                var formatted = item.ToString("Cq.SC");
+                Assert.IsNotNull(formatted);
+                Assert.AreEqual("@inproceedings{mueller:2022:power, author = \"Müller, Christoph and Heinemann, Moritz and Weiskopf, Daniel and Ertl, Thomas\", booktitle = \"Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)\", doi = \"10.1109/BELIV57783.2022.00009\", month = \"October\", pages = \"38-46\", title = \"Power Overwhelming: Quantifying the Energy Cost of Visualisation\", year = \"2022\"}", formatted);
+            }
+
+            {
+                var formatted = item.ToString("l.SC");
+                Assert.IsNotNull(formatted);
+                Assert.AreEqual($"@inproceedings{{mueller:2022:power,{Environment.NewLine}author = {{Müller, Christoph and Heinemann, Moritz and Weiskopf, Daniel and Ertl, Thomas}},{Environment.NewLine}booktitle = {{Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)}},{Environment.NewLine}doi = {{10.1109/BELIV57783.2022.00009}},{Environment.NewLine}month = {{October}},{Environment.NewLine}pages = {{38-46}},{Environment.NewLine}title = {{Power Overwhelming: Quantifying the Energy Cost of Visualisation}},{Environment.NewLine}year = {{2022}}{Environment.NewLine}}}", formatted);
+            }
+
+            {
+                var formatted = item.ToString("ql.SC");
+                Assert.IsNotNull(formatted);
+                Assert.AreEqual($"@inproceedings{{mueller:2022:power,{Environment.NewLine}author = \"Müller, Christoph and Heinemann, Moritz and Weiskopf, Daniel and Ertl, Thomas\",{Environment.NewLine}booktitle = \"Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)\",{Environment.NewLine}doi = \"10.1109/BELIV57783.2022.00009\",{Environment.NewLine}month = \"October\",{Environment.NewLine}pages = \"38-46\",{Environment.NewLine}title = \"Power Overwhelming: Quantifying the Energy Cost of Visualisation\",{Environment.NewLine}year = \"2022\"{Environment.NewLine}}}", formatted);
+            }
+
+            {
+                var formatted = item.ToString("s1q.SC");
+                Assert.IsNotNull(formatted);
+                Assert.AreEqual($"@inproceedings{{mueller:2022:power,{Environment.NewLine} author = \"Müller, Christoph and Heinemann, Moritz and Weiskopf, Daniel and Ertl, Thomas\",{Environment.NewLine} booktitle = \"Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)\",{Environment.NewLine} doi = \"10.1109/BELIV57783.2022.00009\",{Environment.NewLine} month = \"October\",{Environment.NewLine} pages = \"38-46\",{Environment.NewLine} title = \"Power Overwhelming: Quantifying the Energy Cost of Visualisation\",{Environment.NewLine} year = \"2022\"{Environment.NewLine}}}", formatted);
+            }
+
+            {
+                var formatted = item.ToString("s2q.SC");
+                Assert.IsNotNull(formatted);
+                Assert.AreEqual($"@inproceedings{{mueller:2022:power,{Environment.NewLine}  author = \"Müller, Christoph and Heinemann, Moritz and Weiskopf, Daniel and Ertl, Thomas\",{Environment.NewLine}  booktitle = \"Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)\",{Environment.NewLine}  doi = \"10.1109/BELIV57783.2022.00009\",{Environment.NewLine}  month = \"October\",{Environment.NewLine}  pages = \"38-46\",{Environment.NewLine}  title = \"Power Overwhelming: Quantifying the Energy Cost of Visualisation\",{Environment.NewLine}  year = \"2022\"{Environment.NewLine}}}", formatted);
+            }
+
+            {
+                var formatted = item.ToString("s4q.SC");
+                Assert.IsNotNull(formatted);
+                Assert.AreEqual($"@inproceedings{{mueller:2022:power,{Environment.NewLine}    author = \"Müller, Christoph and Heinemann, Moritz and Weiskopf, Daniel and Ertl, Thomas\",{Environment.NewLine}    booktitle = \"Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)\",{Environment.NewLine}    doi = \"10.1109/BELIV57783.2022.00009\",{Environment.NewLine}    month = \"October\",{Environment.NewLine}    pages = \"38-46\",{Environment.NewLine}    title = \"Power Overwhelming: Quantifying the Energy Cost of Visualisation\",{Environment.NewLine}    year = \"2022\"{Environment.NewLine}}}", formatted);
+            }
+
+            {
+                var formatted = item.ToString("tq.SC");
+                Assert.IsNotNull(formatted);
+                Assert.AreEqual($"@inproceedings{{mueller:2022:power,{Environment.NewLine}\tauthor = \"Müller, Christoph and Heinemann, Moritz and Weiskopf, Daniel and Ertl, Thomas\",{Environment.NewLine}\tbooktitle = \"Proceedings of the 2022 IEEE Workshop on Evaluation and Beyond – Methodological Approaches for Visualization (BELIV)\",{Environment.NewLine}\tdoi = \"10.1109/BELIV57783.2022.00009\",{Environment.NewLine}\tmonth = \"October\",{Environment.NewLine}\tpages = \"38-46\",{Environment.NewLine}\ttitle = \"Power Overwhelming: Quantifying the Energy Cost of Visualisation\",{Environment.NewLine}\tyear = \"2022\"{Environment.NewLine}}}", formatted);
+            }
+
+            {
+                var formatted = item.ToString(".SC");
+                Assert.IsNotNull(formatted);
+                Assert.AreEqual(item.ToString("s4.SC"), formatted);
+            }
+
+            {
+                var formatted = item.ToString("s0q.SC");
+                Assert.IsNotNull(formatted);
+                Assert.AreEqual(item.ToString("s1q.SC"), formatted);
+            }
+        }
     }
 }

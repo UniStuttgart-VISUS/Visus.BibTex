@@ -7,6 +7,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 
 namespace Visus.BibTex {
@@ -61,15 +63,17 @@ namespace Visus.BibTex {
         /// </summary>
         public IEnumerable<Name>? Author {
             get => this.GetField<IEnumerable<Name>>(WellKnownFields.Author);
-            set => this.SetField<IEnumerable<Name>>(WellKnownFields.Author,
-                value);
+            set => this.SetField(WellKnownFields.Author, value);
         }
 
         /// <summary>
         /// Gets or sets the title of the book when referencing a part of it,
         /// such as a chapter.
         /// </summary>
-        public string? BookTitle => this.GetField(WellKnownFields.BookTitle);
+        public string? BookTitle {
+            get => this.GetField(WellKnownFields.BookTitle);
+            set => this.SetField(WellKnownFields.BookTitle, value);
+        }
 
         /// <summary>
         /// Gets or sets the specific chapter or section number within a larger
@@ -113,8 +117,7 @@ namespace Visus.BibTex {
         /// </summary>
         public IEnumerable<Name>? Editor {
             get => this.GetField<IEnumerable<Name>>(WellKnownFields.Editor);
-            set => this.SetField<IEnumerable<Name>>(WellKnownFields.Editor,
-                value);
+            set => this.SetField(WellKnownFields.Editor, value);
         }
 
         /// <summary>
@@ -293,8 +296,136 @@ namespace Visus.BibTex {
 
         /// <inheritdoc />
         public string ToString(string? format,
-                IFormatProvider? formatProvider) {
-            throw new NotImplementedException();
+                IFormatProvider? formatProvider = null) {
+            var splitPos = format?.IndexOf('.');
+
+            // Split the format for the entry from the format for the names.
+            var entryFormat = ((splitPos != null) && (splitPos >= 0))
+                ? format!.Substring(0, splitPos.Value)
+                : "s4";
+            var nameFormat = ((splitPos != null) && (splitPos >= 0))
+                ? format!.Substring(splitPos.Value + 1)
+                : NameFormats.SurnamesSuffixChristianNameMiddleNames;
+
+            // Make sure that the formats are not empty.
+            if (string.IsNullOrWhiteSpace(entryFormat)) {
+                entryFormat = "s4";
+            }
+            if (string.IsNullOrEmpty(nameFormat)) {
+                nameFormat = NameFormats.SurnamesSuffixChristianNameMiddleNames;
+            }
+
+            // Now we can parse the entry format.
+            var indent = string.Empty;
+            var multiplier = 0;
+            var separator = string.Empty;
+            var space = string.Empty;
+            var quoted = false;
+
+            foreach (var f in entryFormat) {
+                switch (f) {
+                    case 'c':
+                        indent = string.Empty;
+                        separator = string.Empty;
+                        space = string.Empty;
+                        break;
+
+                    case 'C':
+                        indent = string.Empty;
+                        separator = " ";
+                        space = " ";
+                        break;
+
+                    case 'q':
+                        quoted = true;
+                        break;
+
+                    case 'l':
+                        indent = string.Empty;
+                        multiplier = 0;
+                        separator = Environment.NewLine;
+                        space = " ";
+                        break;
+
+                    case 's':
+                    case 'S':
+                        indent = " ";
+                        multiplier = 0;
+                        separator = Environment.NewLine;
+                        space = " ";
+                        break;
+
+                    case 't':
+                    case 'T':
+                        indent = "\t";
+                        multiplier = 0;
+                        separator = Environment.NewLine;
+                        space = " ";
+                        break;
+
+                    default:
+                        if (char.IsDigit(f)) {
+                            multiplier *= 10;
+                            multiplier += (f - '0');
+                        }
+                        break;
+                }
+            }
+
+            if (indent.Length > 0) {
+                indent = new string(indent.Single(), Math.Max(1, multiplier));
+            }
+
+            var retval = new StringBuilder("@");
+            retval.Append(this.EntryType).Append("{");
+            retval.Append(this.Key);
+
+            foreach (var f in this._fields.Keys.OrderBy(f => f)) {
+                var value = this[f];
+                if (value == null) {
+                    continue;
+                }
+
+                retval.Append(',').Append(separator);
+                retval.Append(indent);
+                retval.Append(f).Append(space).Append('=').Append(space);
+
+                if (quoted) {
+                    retval.Append('"');
+                } else {
+                    retval.Append("{");
+                }
+
+                if (value is IEnumerable<Name> names) {
+                    var first = true;
+
+                    foreach (var n in names) {
+                        if (first) {
+                            first = false;
+                        } else {
+                            retval.Append(" and ");
+                        }
+
+                        retval.Append(n.ToString(nameFormat));
+                    }
+
+                } else {
+                    retval.Append(value);
+                }
+
+                if (quoted) {
+                    retval.Append('"');
+                } else {
+                    retval.Append("}");
+                }
+            }
+
+            if (separator == Environment.NewLine) {
+                retval.Append(separator);
+            }
+
+            retval.Append("}");
+            return retval.ToString();
         }
 
         /// <inheritdoc />
