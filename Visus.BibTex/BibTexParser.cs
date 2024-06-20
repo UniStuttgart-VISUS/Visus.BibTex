@@ -51,7 +51,7 @@ namespace Visus.BibTex {
         /// <returns></returns>
         public static IEnumerable<TBibItem> Parse(TextReader reader,
                 BibTexParserOptions<TBibItem> options) {
-            var state = new State(BibTexLexer.Tokenise(reader), options);
+            var state = new State(BibTexTokeniser.Tokenise(reader), options);
             var sb = new StringBuilder();
 
             while (state.IsValid) {

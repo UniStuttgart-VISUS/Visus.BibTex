@@ -8,7 +8,7 @@
 namespace Visus.BibTex {
 
     /// <summary>
-    /// Specifies the type of tokens the <see cref="BibTexLexer"/> can create.
+    /// Specifies the type of tokens the <see cref="BibTexTokeniser"/> can create.
     /// </summary>
     internal enum BibTexTokenType {
 
@@ -64,7 +64,7 @@ namespace Visus.BibTex {
         Letter,
 
         /// <summary>
-        /// A lign break.
+        /// A line break.
         /// </summary>
         NewLine,
 

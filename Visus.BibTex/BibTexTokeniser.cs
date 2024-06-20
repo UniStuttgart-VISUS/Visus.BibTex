@@ -1,4 +1,4 @@
-﻿// <copyright file="BibTexLexer.cs" company="Visualisierungsinstitut der Universität Stuttgart">
+﻿// <copyright file="BibTexTokeniser.cs" company="Visualisierungsinstitut der Universität Stuttgart">
 // Copyright © 2024 Visualisierungsinstitut der Universität Stuttgart.
 // Licensed under the MIT licence. See LICENCE file for details.
 // </copyright>
@@ -14,7 +14,7 @@ namespace Visus.BibTex {
     /// <summary>
     /// Lexer for BibTex tokens.
     /// </summary>
-    internal static class BibTexLexer {
+    internal static class BibTexTokeniser {
 
         /// <summary>
         /// Scan the input and return the tokens it comprises of.
