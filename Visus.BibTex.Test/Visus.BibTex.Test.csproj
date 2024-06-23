@@ -20,4 +20,10 @@
     <ProjectReference Include="..\Visus.BibTex\Visus.BibTex.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="ctan.bib">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
