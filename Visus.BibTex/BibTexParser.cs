@@ -286,7 +286,8 @@ namespace Visus.BibTex {
                 }
 
                 // Remember whether we are escaped for the next iteration.
-                escaped = (state.CurrentTokenType == BibTexTokenType.Backslash);
+                escaped = !escaped
+                    && (state.CurrentTokenType == BibTexTokenType.Backslash);
             }
 
             throw new FormatException(string.Format(Resources.ErrorPrematureEnd,

@@ -113,6 +113,25 @@ namespace Visus.BibTex.Test {
                 Assert.AreEqual("BS", item.Type);
                 Assert.AreEqual("1629", item.Number);
             }
+
+            {
+                var item = items.SingleOrDefault(i => i.Key == "hershkovitz-62");
+                Assert.IsNotNull(item);
+                Assert.AreEqual(WellKnownTypes.Book, item.EntryType);
+                Assert.IsNotNull(item.Author);
+                Assert.IsTrue(item.Author.Any(a => a.Surname == "Hershkovitz"));
+                Assert.IsTrue(item.Author.Any(a => a.ChristianName == "P."));
+                Assert.AreEqual("1962", item.Year);
+                Assert.AreEqual("""
+Evolution of {Neotropical} cricetine rodents
+                 ({Muridae}) with special reference to the phyllotine
+                 group
+""", item.Title);
+                Assert.AreEqual("Fieldiana: Zoology", item.Series);
+                Assert.AreEqual("46", item.Volume);
+                Assert.AreEqual("Chicago", item.Address);
+                Assert.AreEqual("Field Museum of Natural History", item.Publisher);
+            }
         }
 
         [TestMethod]

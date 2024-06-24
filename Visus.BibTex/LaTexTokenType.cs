@@ -1,4 +1,4 @@
-﻿// <copyright file="LaTexTokenType.cs" company="Visualisierungsinstitut der Universität Stuttgart">
+﻿// <copyright file="LatexTokenType.cs" company="Visualisierungsinstitut der Universität Stuttgart">
 // Copyright © 2024 Visualisierungsinstitut der Universität Stuttgart.
 // Licensed under the MIT licence. See LICENCE file for details.
 // </copyright>
@@ -11,7 +11,7 @@ namespace Visus.BibTex {
     /// Specifies the tokens used for partial analysis of LaTex control
     /// sequences in BibTex fields.
     /// </summary>
-    internal enum LaTexTokenType {
+    internal enum LatexTokenType {
 
         /// <summary>
         /// The backslash, which is the escape character and the begin of a
@@ -40,19 +40,14 @@ namespace Visus.BibTex {
         End,
 
         /// <summary>
-        /// A line break.
+        /// A hyphen, which may be part of a dash or long dash.
         /// </summary>
-        NewLine,
+        Hyphen,
 
         /// <summary>
         /// A string literal.
         /// </summary>
         Literal,
-
-        /// <summary>
-        /// A double quote.
-        /// </summary>
-        Quote,
 
         /// <summary>
         /// A sequence of one or more white spaces.

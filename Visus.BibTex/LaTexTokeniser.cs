@@ -1,4 +1,4 @@
-﻿// <copyright file="LaTexTokeniser.cs" company="Visualisierungsinstitut der Universität Stuttgart">
+﻿// <copyright file="LatexTokeniser.cs" company="Visualisierungsinstitut der Universität Stuttgart">
 // Copyright © 2024 Visualisierungsinstitut der Universität Stuttgart.
 // Licensed under the MIT licence. See LICENCE file for details.
 // </copyright>
@@ -15,24 +15,24 @@ namespace Visus.BibTex {
     /// Lexer for LaTex tokens.
     /// </summary>
     /// <param name="input">The input to be processed.</param>
-    internal ref struct LaTexTokeniser(ReadOnlySpan<char> input) {
+    internal ref struct LatexTokeniser(ReadOnlySpan<char> input) {
 
         #region Public methods
         /// <summary>
         /// Produces the next token.
         /// </summary>
         /// <returns>The next token from the input.</returns>
-        public LaTexToken Next() {
+        public LatexToken Next() {
             if (this._input.Length < 1) {
-                return new LaTexToken(LaTexTokenType.End, new());
+                return new LatexToken(LatexTokenType.End, new());
             }
 
             var type = Classify(this._input[0]);
             var length = type switch {
-                LaTexTokenType.WhiteSpace => this.ScanWhile(
+                LatexTokenType.WhiteSpace => this.ScanWhile(
                     char.IsWhiteSpace),
-                LaTexTokenType.Literal => this.ScanWhile(
-                    c => Classify(c) == LaTexTokenType.Literal),
+                LatexTokenType.Literal => this.ScanWhile(
+                    c => Classify(c) == LatexTokenType.Literal),
                 _ => 1
             };
 
@@ -44,21 +44,20 @@ namespace Visus.BibTex {
         #region Private class methods
         /// <summary>
         /// Classify <paramref name="c"/> as one of the
-        /// <see cref="LaTexTokenType"/>s.
+        /// <see cref="LatexTokenType"/>s.
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static LaTexTokenType Classify(char c) => c switch {
-            '\\' => LaTexTokenType.Backslash,
-            '{' => LaTexTokenType.BraceLeft,
-            '}' => LaTexTokenType.BraceRight,
-            '$' => LaTexTokenType.Dollar,
-            '\n' => LaTexTokenType.NewLine,
-            '"' => LaTexTokenType.Quote,
+        private static LatexTokenType Classify(char c) => c switch {
+            '\\' => LatexTokenType.Backslash,
+            '{' => LatexTokenType.BraceLeft,
+            '}' => LatexTokenType.BraceRight,
+            '$' => LatexTokenType.Dollar,
+            '-' => LatexTokenType.Hyphen,
             _ => char.IsWhiteSpace(c)
-                ? LaTexTokenType.WhiteSpace
-                : LaTexTokenType.Literal
+                ? LatexTokenType.WhiteSpace
+                : LatexTokenType.Literal
         };
         #endregion
 

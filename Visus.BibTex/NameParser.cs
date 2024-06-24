@@ -215,10 +215,10 @@ namespace Visus.BibTex {
 
                     default:
                         throw new NotImplementedException("An unexpected token "
-                            + "was encountered while parsing names. This is a "
-                            + $"bug in {nameof(NameParser)}.{nameof(ParseList)}"
-                            + "(), which was not updated to account for new "
-                            + "tokens produced by the "
+                            + $"{token.Type} was encountered while parsing "
+                            + $"names. This is a bug in {nameof(NameParser)}."
+                            + $"{nameof(ParseList)}() which was not updated "
+                            + "to account for new tokens produced by the "
                             + $"{nameof(NameTokeniser)}.");
                 }
             }
