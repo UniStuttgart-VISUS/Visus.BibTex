@@ -4,12 +4,9 @@
 // </copyright>
 // <author>Christoph Müller</author>
 
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace Visus.BibTex.Test {
@@ -90,6 +87,62 @@ namespace Visus.BibTex.Test {
                 Assert.AreEqual("article", items.First().EntryType);
                 Assert.AreEqual("hugo", items.First().Key);
                 Assert.IsTrue(items.First().ContainsField("year"));
+            }
+        }
+
+        [TestMethod]
+        public void TestProcessLatex() {
+            {
+                var bibtex = """
+@ARTICLE{Fellner-Helmberg93,
+	AUTHOR = {Fellner, Dieter W. and Helmberg, Christoph},
+	TITLE = {Robust Rendering of General Ellipses and Elliptical Arcs},
+	JOURNAL = tog,
+	VOLUME = {12},	NUMBER = {3},
+	MONTH = jul,	YEAR = {1993},	PAGES = {251-276},
+  DOI= {10.1145/169711.169704}
+  }
+""";
+                var options = BibTexParserOptions.Create();
+                options.ProcessLatex = true;
+                options.Variables.Add("tog", "ACM Transactions on Graphics");
+                var item = BibTexParser<BibItem>.Parse<BibItemBuilder>(new StringReader(bibtex), options).SingleOrDefault();
+                Assert.IsNotNull(item);
+                Assert.AreEqual("article", item.EntryType);
+                Assert.AreEqual("Fellner-Helmberg93", item.Key);
+                Assert.AreEqual("ACM Transactions on Graphics", item.Journal);
+                Assert.AreEqual("12", item.Volume);
+                Assert.AreEqual("3", item.Number);
+                Assert.AreEqual("July", item.Month);
+                Assert.AreEqual("1993", item.Year);
+                Assert.AreEqual("251-276", item.Pages);
+                Assert.AreEqual("10.1145/169711.169704", item.Doi);
+            }
+
+            {
+                var bibtex = """
+@inproceedings{Macedo:2021:Tool,
+    author="Macedo, In{\^e}s and Wanous, Sinan and Oliveira, Nuno and Sousa, Orlando and Pra{\c{c}}a, Isabel",
+    title={A Tool to Support the Investigation and Visualization of Cyber and/or Physical Incidents},
+    booktitle={Proc. Trends Appl. Inf. Syst. Tech.},
+    year={2021},
+    pages={130--140},
+    doi={10/mh45},
+}
+""";
+                var options = BibTexParserOptions.Create();
+                options.ProcessLatex = true;
+                var item = BibTexParser<BibItem>.Parse<BibItemBuilder>(new StringReader(bibtex), options).SingleOrDefault();
+                Assert.IsNotNull(item);
+                Assert.AreEqual("inproceedings", item.EntryType);
+                Assert.AreEqual("Macedo:2021:Tool", item.Key);
+                Assert.IsNotNull(item.Author);
+                Assert.AreEqual("Inês", item.Author.First().ChristianName);
+                Assert.AreEqual("Praça", item.Author.Last().Surname);
+                Assert.AreEqual("Proc. Trends Appl. Inf. Syst. Tech.", item.BookTitle);
+                Assert.AreEqual("2021", item.Year);
+                Assert.AreEqual("130--140", item.Pages);
+                Assert.AreEqual("10/mh45", item.Doi);
             }
         }
 

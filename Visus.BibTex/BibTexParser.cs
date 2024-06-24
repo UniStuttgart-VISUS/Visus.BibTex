@@ -482,6 +482,7 @@ namespace Visus.BibTex {
             // be without quotes, strings in quotes and strings in braces. Note
             // that we interpret a letter as the begin of a variable name here,
             // which will be processed by the branch for quoted strings.
+            var braced = state.CurrentTokenType == BibTexTokenType.BraceLeft;
             var value = state.CurrentTokenType switch {
                 BibTexTokenType.Digit => ParseDigits(state),
                 BibTexTokenType.Quote => ParseQuotedStrings(state),
@@ -492,6 +493,11 @@ namespace Visus.BibTex {
                     state.CurrentCharacter))
             };
             Debug.WriteLine($"Field value is \"{value}\".");
+
+            if (state.Options.ProcessLatex) {
+                value = LatexConverter.ConvertBracedParts(value);
+                Debug.WriteLine($"Field value is \"{value}\".");
+            }
 
             // Skip trailing spaces, such that the caller is on the comma
             // separating two fields or on the brace ending the entry.

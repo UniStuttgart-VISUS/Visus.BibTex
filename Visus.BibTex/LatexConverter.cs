@@ -28,7 +28,7 @@ namespace Visus.BibTex {
         /// <returns>The text which has as many Latex commands within braced
         /// ranges replaced with matching Unicode characters as possible.
         /// </returns>
-        public static string? ConvertBracedParts(ReadOnlySpan<char> text) {
+        public static string ConvertBracedParts(ReadOnlySpan<char> text) {
             var retval = new StringBuilder();
             var tokeniser = new LatexTokeniser(text);
 
@@ -65,7 +65,7 @@ namespace Visus.BibTex {
         /// <returns>The text which has as many Latex commands replaced with
         /// matching Unicode characters as possible.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string? ConvertFrom(ReadOnlySpan<char> text) {
+        public static string ConvertFrom(ReadOnlySpan<char> text) {
             var tokeniser = new LatexTokeniser(text);
             var retval = ParseLatex(ref tokeniser, new(), false);
             return retval.ToString().Normalize();

@@ -75,6 +75,17 @@ namespace Visus.BibTex {
         public bool Lenient { get; set; } = false;
 
         /// <summary>
+        /// Gets or sets whether the parser should process Latex content in
+        /// each field to the extent possible.
+        /// </summary>
+        /// <remarks>
+        /// This option causes the parser to replace Latex diacritics and other
+        /// known control sequences with corresponding Unicode characters or
+        /// marks.
+        /// </remarks>
+        public bool ProcessLatex { get; set; } = false;
+
+        /// <summary>
         /// Gets a set of string variables that are injected into the parser.
         /// </summary>
         public Dictionary<string, string> Variables {
