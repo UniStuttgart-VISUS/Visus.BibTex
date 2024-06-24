@@ -21,6 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="becker2024alertsets.bib">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="ctan.bib">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
