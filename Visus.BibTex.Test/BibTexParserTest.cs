@@ -10,8 +10,12 @@ using System;
 using System.Diagnostics.Metrics;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Reflection;
 using System.Runtime.ConstrainedExecution;
+using System.Runtime.Intrinsics.X86;
 using System.Security.Cryptography;
+using static System.Collections.Specialized.BitVector32;
 
 
 namespace Visus.BibTex.Test {
@@ -440,6 +444,93 @@ Evolution of {Neotropical} cricetine rodents
             Assert.IsTrue(items.Any(i => i.Key == "Shneiderman:2003:eyes"));
             Assert.IsTrue(items.Any(i => i.Key == "White:2009:ExploratorySearch"));
             Assert.IsTrue(items.Any(i => i.Key == "Marchionini:2006:ExploratorySearch"));
+        }
+
+        [TestMethod]
+        [DeploymentItem("gralka2024power.bib")]
+        public void TestGralka2024Power() {
+            var options = BibTexParserOptions.Create();
+            options.ProcessLatex = true;
+
+            Assert.IsTrue(File.Exists("gralka2024power.bib"));
+            var items = BibTexParser<BibItem>.Parse(new StreamReader("gralka2024power.bib"), options).ToList();
+            Assert.AreEqual(74, items.Count);
+
+            Assert.IsTrue(items.Any(i => i.Key == "Grinstein:2002:IVV"));
+            Assert.IsTrue(items.Any(i => i.Key == "Isenberg:2017:VMC"));
+            Assert.IsTrue(items.Any(i => i.Key == "Kindlmann:1999:SAG"));
+            Assert.IsTrue(items.Any(i => i.Key == "Kitware:2003"));
+            Assert.IsTrue(items.Any(i => i.Key == "Levoy:1989:DSV"));
+            Assert.IsTrue(items.Any(i => i.Key == "Lorensen:1987:MCA"));
+            Assert.IsTrue(items.Any(i => i.Key == "Max:1995:OMF"));
+            Assert.IsTrue(items.Any(i => i.Key == "Nielson:1991:TAD"));
+            Assert.IsTrue(items.Any(i => i.Key == "Ware:2004:IVP"));
+            Assert.IsTrue(items.Any(i => i.Key == "Wyvill:1986:DSS"));
+            Assert.IsTrue(items.Any(i => i.Key == "Chuang:2009:EAC"));
+            Assert.IsTrue(items.Any(i => i.Key == "Wang:2016:RTR"));
+            Assert.IsTrue(items.Any(i => i.Key == "bridges:2016:understanding"));
+            Assert.IsTrue(items.Any(i => i.Key == "hong:2010:model"));
+            Assert.IsTrue(items.Any(i => i.Key == "burtscher:2014:k20"));
+            Assert.IsTrue(items.Any(i => i.Key == "abe:2012:power"));
+            Assert.IsTrue(items.Any(i => i.Key == "johnsson:2012:efficiency"));
+            Assert.IsTrue(items.Any(i => i.Key == "johnsson:2014:measuring"));
+            Assert.IsTrue(items.Any(i => i.Key == "luo:2011:model"));
+            Assert.IsTrue(items.Any(i => i.Key == "mittal:2014:survey"));
+            Assert.IsTrue(items.Any(i => i.Key == "arafa:2020:verified"));
+            Assert.IsTrue(items.Any(i => i.Key == "mei:2013:dvfs"));
+            Assert.IsTrue(items.Any(i => i.Key == "weaver:2012:papi"));
+            Assert.IsTrue(items.Any(i => i.Key == "fahad:2019:survey"));
+            Assert.IsTrue(items.Any(i => i.Key == "jahanshahi:2020:inference"));
+            Assert.IsTrue(items.Any(i => i.Key == "rethinagiri:2015:fpga"));
+            Assert.IsTrue(items.Any(i => i.Key == "qasaimeh:2019:fpga"));
+            Assert.IsTrue(items.Any(i => i.Key == "collange:2009:software"));
+            Assert.IsTrue(items.Any(i => i.Key == "iea:2021:datacentres"));
+            Assert.IsTrue(items.Any(i => i.Key == "holmes:2012:ecovis"));
+            Assert.IsTrue(items.Any(i => i.Key == "cerf:2021:space"));
+            Assert.IsTrue(items.Any(i => i.Key == "wallossek:2022:readout"));
+            Assert.IsTrue(items.Any(i => i.Key == "amberger:2021:shunt"));
+            Assert.IsTrue(items.Any(i => i.Key == "borkar:2011:future"));
+            Assert.IsTrue(items.Any(i => i.Key == "jones:2018:factories"));
+            Assert.IsTrue(items.Any(i => i.Key == "heinemann:2017:mobile"));
+            Assert.IsTrue(items.Any(i => i.Key == "andrae:2015:electricity"));
+            Assert.IsTrue(items.Any(i => i.Key == "ma:2009:statistical"));
+            Assert.IsTrue(items.Any(i => i.Key == "nagasaka:2010:statistical"));
+            Assert.IsTrue(items.Any(i => i.Key == "sheaffer:2004:simulation"));
+            Assert.IsTrue(items.Any(i => i.Key == "ramani:2007:powerred"));
+            Assert.IsTrue(items.Any(i => i.Key == "lim:2014:mcpat"));
+            Assert.IsTrue(items.Any(i => i.Key == "hu:2021:dl"));
+            Assert.IsTrue(items.Any(i => i.Key == "bruder:2019:evaluating"));
+            Assert.IsTrue(items.Any(i => i.Key == "grottel:2015:megamol"));
+            Assert.IsTrue(items.Any(i => i.Key == "gumhold:2003:splatting"));
+            Assert.IsTrue(items.Any(i => i.Key == "krueger:2003:acceleration"));
+            Assert.IsTrue(items.Any(i => i.Key == "heinrich:2009:parco"));
+            Assert.IsTrue(items.Any(i => i.Key == "schulz:2016:generative"));
+            Assert.IsTrue(items.Any(i => i.Key == "hall:1879:action"));
+            Assert.IsTrue(items.Any(i => i.Key == "schneider:2020:pcat"));
+            Assert.IsTrue(items.Any(i => i.Key == "ramsden:2006:hall"));
+            Assert.IsTrue(items.Any(i => i.Key == "nvidia:nvml"));
+            Assert.IsTrue(items.Any(i => i.Key == "amd:adl"));
+            Assert.IsTrue(items.Any(i => i.Key == "darus-3044_2022"));
+            Assert.IsTrue(items.Any(i => i.Key == "mueller:2022:overwhelming"));
+            Assert.IsTrue(items.Any(i => i.Key == "microsoft:emi"));
+            Assert.IsTrue(items.Any(i => i.Key == "microsoft:stable"));
+            Assert.IsTrue(items.Any(i => i.Key == "ni:lpt"));
+            Assert.IsTrue(items.Any(i => i.Key == "intel:rapl"));
+            Assert.IsTrue(items.Any(i => i.Key == "rus:rta4004"));
+            Assert.IsTrue(items.Any(i => i.Key == "rus:rtb2004"));
+            Assert.IsTrue(items.Any(i => i.Key == "ivi:visa"));
+            Assert.IsTrue(items.Any(i => i.Key == "intel:atx"));
+            Assert.IsTrue(items.Any(i => i.Key == "shannon1949communication"));
+            Assert.IsTrue(items.Any(i => i.Key == "khan:2018:rapl"));
+            Assert.IsTrue(items.Any(i => i.Key == "haehnel:2012:rapl"));
+            Assert.IsTrue(items.Any(i => i.Key == "hackenberg:2013:quantitative"));
+            Assert.IsTrue(items.Any(i => i.Key == "lipp:2021:platypus"));
+            Assert.IsTrue(items.Any(i => i.Key == "Gralka2019MegaMol"));
+            Assert.IsTrue(items.Any(i => i.Key == "visus:pwrowg"));
+            Assert.IsTrue(items.Any(i => i.Key == "apache:parquet"));
+            Assert.IsTrue(items.Any(i => i.Key == "Parker_OptiX_2010"));
+            Assert.IsTrue(items.Any(i => i.Key == "Sinha2022NotAllGPUs"));
+
         }
     }
 }

@@ -1,4 +1,4 @@
-# Visus.BibTex
+﻿# Visus.BibTex
 
 [![Build Status](https://visualisierungsinstitut.visualstudio.com/Visus.BibTex/_apis/build/status/UniStuttgart-VISUS.Visus.BibTex?branchName=master)](https://visualisierungsinstitut.visualstudio.com/Visus.BibTex/_build/latest?definitionId=9&branchName=master)
 [![Visus.BibTexVersion](https://buildstats.info/nuget/Visus.BibTex)](https://www.nuget.org/packages/Visus.BibTex)
