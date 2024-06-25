@@ -103,53 +103,24 @@ namespace Visus.BibTex {
         }
 
         /// <summary>
-        /// Convert a series of <paramref name="count"/> hyphens to Unicode
-        /// dashes or hyphens in <paramref name="retval"/>.
+        /// Match the start of <paramref name="token"/> to one of the elements
+        /// of <paramref name="table"/> or of <see cref="TextDiacritics"/> if
+        /// no table was specified.
         /// </summary>
-        /// <param name="count"></param>
-        /// <param name="retval"></param>
-        /// <returns></returns>
-        private static StringBuilder EmitHyphens(int count,
-                StringBuilder retval) {
-            Debug.Assert(retval != null);
-
-            while (count > 0) {
-                switch (count) {
-                    case 1:
-                        retval.Append('\u002d');
-                        --count;
-                        break;
-
-                    case 2:
-                        retval.Append('\u2013');
-                        count -= 2;
-                        break;
-
-                    default:
-                        retval.Append('\u2014');
-                        count -= 3;
-                        break;
-                }
-            }
-
-            return retval;
-        }
-
-        /// <summary>
-        /// Match the start of <paramref name="token"/> to one of the hard-coded
-        /// <see cref="Diacritics"/> or, if <paramref name="full"/> is
-        /// <c>true</c>, whether the whole <paramref name="token"/> matches one
-        /// of the <see cref="Diacritics"/>.
-        /// </summary>
+        /// <remarks>
+        /// Diacritics will be matched in order of occurrence in
+        /// <paramref name="table"/>, so longer tokens must be at the begin of
+        /// the table for this to work.
+        /// </remarks>
         /// <param name="token">The token to match agains
         /// <see cref="Diacritic.Latex"/>.</param>
-        /// <param name="full">If <c>true</c>, the whole token must match the
-        /// diacritic. Otherwise, only the begin must match.</param>
+        /// <param name="table">The table to use. If <c>null</c>, which is the
+        /// default, <see cref="TextDiacritics"/> is used.</param>
         /// <returns></returns>
-        private static Diacritic? MatchDiacritic(LatexToken token, bool full) {
-            foreach (var d in Diacritics) {
-                if (token.Text.StartsWith(d.Latex)
-                        && ((token.Length == d.Latex.Length) || !full)) {
+        private static Diacritic? MatchDiacritic(LatexToken token,
+                Diacritic[]? table = null) {
+            foreach (var d in table ?? TextDiacritics) {
+                if (token.Text.StartsWith(d.Latex)) {
                     return d;
                 }
             }
@@ -183,9 +154,25 @@ namespace Visus.BibTex {
 
                 // A series of hyphens as ended, so we emit them before we
                 // continue.
-                if ((hyphens > 0) && !token.Is(LatexTokenType.Hyphen)) {
-                    EmitHyphens(hyphens, retval);
-                    hyphens = 0;
+                if (!token.Is(LatexTokenType.Hyphen)) {
+                    while (hyphens > 0) {
+                        switch (hyphens) {
+                            case 1:
+                                retval.Append('\u002d');
+                                --hyphens;
+                                break;
+
+                            case 2:
+                                retval.Append('\u2013');
+                                hyphens -= 2;
+                                break;
+
+                            default:
+                                retval.Append('\u2014');
+                                hyphens -= 3;
+                                break;
+                        }
+                    }
                 }
 
                 switch (token.Type) {
@@ -264,7 +251,7 @@ namespace Visus.BibTex {
                         // Either interpret the following literal as a command
                         // or just emit it if it is not escaped.
                         if (command) {
-                            diacritic = MatchDiacritic(token, full);
+                            diacritic = MatchDiacritic(token);
                             if (diacritic != null) {
                                 if (diacritic.IsCombining) {
                                     // This is a combining diacritic mark in
@@ -290,7 +277,6 @@ namespace Visus.BibTex {
                                         case '%':
                                         case '#':
                                         case '_':
-                                        case '~':
                                         case '^':
                                             break;
 
@@ -319,8 +305,8 @@ namespace Visus.BibTex {
 
                     case LatexTokenType.Tilde:
                         if (command) {
-                            // If escaped, this is the literal.
-                            retval.Append('~');
+                            // If escaped, this is potentially a diacritic.
+                            diacritic = MatchDiacritic(token);
                             command = false;
                         } else {
                             // This is a protected space.
@@ -412,37 +398,55 @@ namespace Visus.BibTex {
         #endregion
 
         #region Private constants
-        private static readonly Diacritic[] Diacritics = [
-            new("`", '\u0300'),
-            new("'", '\u0301'),
-            new("^", '\u0302'),
-            new("\"", '\u0308'),
-            new("H", '\u030B'),
-            new("~", '\u0303'),
-            new("c", '\u0327'),
-            new("k", '\u0328'),
-            new("l", 'ł'),
-            new("L", 'Ł'),
-            new("=", '\u0304'),
-            new("b", '\u0331'),
-            new(".", '\u0307'),
-            new("d", '\u0323'),
-            new("r", '\u030A'),
-            new("u", '\u0306'),
-            new("v", '\u030C'),
-            new("o", 'ø'),
-            new("O", 'Ø'),
-            new("t", '\u0361'),
-            new("i", 'ı'),
+        private static readonly Diacritic[] MathDiacritics = [
+            new("hat", '\u0302'),
+            //new("widehat", '\u'),
+            new("check", '\u030C'),
+            new("tilde", '\u0303'),
+            //new("widetilde", '\u'),
+            new("acute", '\u0301'),
+            new("grave", '\u0300'),
+            new("dot", '\u0307'),
+            new("ddot", '\u0308'),
+            new("breve", '\u0306'),
+            new("bar", '\u0304'),
+            //new("vec", '\u'),
+        ];
 
+        private static readonly Diacritic[] TextDiacritics = [
             new("aa", 'å'),
             new("AA", 'Å'),
             new("oe", 'œ'),
             new("OE", 'Œ'),
             new("euro", '€'),
             new("EUR", '€'),
-            new("textdoublegrave", '\u030F')
+            // Longer matches must be before single characters.
+            new("`", '\u0300'),     // grave accent
+            new("'", '\u0301'),     // acute accent
+            new("^", '\u0302'),     // circumflex
+            new("\"", '\u0308'),    // dieresis
+            new("H", '\u030B'),     // Hungarian umlaut
+            new("~", '\u0303'),     // tilde
+            new("c", '\u0327'),     // cedilla
+            new("k", '\u0328'),     // ogonek
+            new("l", 'ł'),
+            new("L", 'Ł'),
+            new("=", '\u0304'),     // macron
+            new("b", '\u0331'),     // bar-under
+            new(".", '\u0307'),     // dot accent
+            new("d", '\u0323'),     // dot-under
+            new("r", '\u030A'),     // 
+            new("u", '\u0306'),     // breve accent
+            new("v", '\u030C'),     // háček
+            new("o", 'ø'),
+            new("O", 'Ø'),
+            new("t", '\u0361'),     // tie-after
+            new("i", 'ı')
         ];
+
+        // Other commands:
+        //new("textdoublegrave", '\u030F'),
+        // emph
         #endregion
     }
 }

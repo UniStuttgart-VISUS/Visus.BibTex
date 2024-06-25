@@ -141,7 +141,7 @@ namespace Visus.BibTex.Test {
                 Assert.AreEqual("Praça", item.Author.Last().Surname);
                 Assert.AreEqual("Proc. Trends Appl. Inf. Syst. Tech.", item.BookTitle);
                 Assert.AreEqual("2021", item.Year);
-                Assert.AreEqual("130--140", item.Pages);
+                Assert.AreEqual("130–140", item.Pages);
                 Assert.AreEqual("10/mh45", item.Doi);
             }
         }
@@ -366,7 +366,7 @@ Evolution of {Neotropical} cricetine rodents
                 Assert.AreEqual("Commun. ACM", item.Journal);
                 Assert.AreEqual("4", item.Month);
                 Assert.AreEqual("4", item.Number);
-                Assert.AreEqual("41--46", item.Pages);
+                Assert.AreEqual("41–46", item.Pages);
                 Assert.AreEqual("Exploratory Search: From Finding to Understanding", item.Title);
                 Assert.AreEqual("49", item.Volume);
                 Assert.AreEqual("2006", item.Year);
@@ -523,6 +523,11 @@ Evolution of {Neotropical} cricetine rodents
             Assert.IsTrue(items.Any(i => i.Key == "Sinha2022NotAllGPUs"));
 
             {
+                var item = items.Where(i => i.Key == "Grinstein:2002:IVV").Single();
+                Assert.AreEqual("IEEE Visualization Course #1 Notes", item["howpublished"]);
+            }
+
+            {
                 var item = items.Where(i => i.Key == "Isenberg:2017:VMC").Single();
                 Assert.AreEqual("vispubdata.org: A Metadata Collection about IEEE Visualization (VIS) Publications", item.Title);
             }
@@ -530,6 +535,12 @@ Evolution of {Neotropical} cricetine rodents
             {
                 var item = items.Where(i => i.Key == "Kindlmann:1999:SAG").Single();
                 Assert.AreEqual("Semi-Automatic Generation of Transfer Functions for Direct Volume Rendering", item.Title);
+            }
+
+            {
+                var item = items.Where(i => i.Key == "Lorensen:1987:MCA").Single();
+                Assert.AreEqual("Marching Cubes: A High Resolution 3D Surface Construction Algorithm", item.Title);
+                Assert.AreEqual("163–169", item.Pages);
             }
 
             {
