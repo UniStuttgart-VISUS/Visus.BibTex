@@ -181,6 +181,13 @@ namespace Visus.BibTex {
             while (true) {
                 var token = tokeniser.Next();
 
+                // A series of hyphens as ended, so we emit them before we
+                // continue.
+                if ((hyphens > 0) && !token.Is(LatexTokenType.Hyphen)) {
+                    EmitHyphens(hyphens, retval);
+                    hyphens = 0;
+                }
+
                 switch (token.Type) {
                     case LatexTokenType.Backslash:
                         if (command) {
@@ -212,7 +219,7 @@ namespace Visus.BibTex {
 
                         } else if (stopAtBrace && (braces == 0)) {
                             // This is the end of a sub-part.
-                            return EmitHyphens(hyphens, retval);
+                            return retval;
 
                         } else if (braces > 0) {
                             // This is a closing brace.
@@ -242,7 +249,7 @@ namespace Visus.BibTex {
                         break;
 
                     case LatexTokenType.End:
-                        return EmitHyphens(hyphens, retval);
+                        return retval;
 
                     case LatexTokenType.Hyphen:
                         // Accumulate to determine whether this is a dash or a
@@ -275,9 +282,28 @@ namespace Visus.BibTex {
                                 }
 
                             } else {
-                                // This is something we do not understand, so we
-                                // emit it literally.
-                                retval.Append('\\').Append(token.Text);
+                                // If this is not a diacritic, check whether we
+                                // have a known special character.
+                                if (token.Text.Length == 1) {
+                                    switch(token.Text[0]) {
+                                        case '&':
+                                        case '%':
+                                        case '#':
+                                        case '_':
+                                        case '~':
+                                        case '^':
+                                            break;
+
+                                        default:
+                                            // This is something we do not
+                                            // understand, so we emit it
+                                            // literally as Latex code.
+                                            retval.Append('\\');
+                                            break;
+                                    }
+                                }
+
+                                retval.Append(token.Text);
                             }
 
                             command = false;
@@ -289,6 +315,18 @@ namespace Visus.BibTex {
                         }
 
                         full = false;
+                        break;
+
+                    case LatexTokenType.Tilde:
+                        if (command) {
+                            // If escaped, this is the literal.
+                            retval.Append('~');
+                            command = false;
+                        } else {
+                            // This is a protected space.
+                            // TODO: we cannot collapse tildes atm.
+                            retval.Append(' ');
+                        }
                         break;
 
                     case LatexTokenType.WhiteSpace:
@@ -305,12 +343,6 @@ namespace Visus.BibTex {
                             + $"{nameof(LatexConverter)}.{nameof(ParseLatex)}()"
                             + "which was not updated to account for new tokens "
                             + $"produced by the {nameof(LatexTokeniser)}.");
-                }
-
-                // A series of hyphens as ended, so we emit them.
-                if ((hyphens > 0) && !token.Is(LatexTokenType.Hyphen)) {
-                    EmitHyphens(hyphens, retval);
-                    hyphens = 0;
                 }
             }
         }

@@ -50,6 +50,11 @@ namespace Visus.BibTex {
         Literal,
 
         /// <summary>
+        /// The tilde character, which is a protected space.
+        /// </summary>
+        Tilde,
+
+        /// <summary>
         /// A sequence of one or more white spaces.
         /// </summary>
         WhiteSpace,

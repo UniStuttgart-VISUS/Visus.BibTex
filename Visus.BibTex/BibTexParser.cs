@@ -495,7 +495,7 @@ namespace Visus.BibTex {
             Debug.WriteLine($"Field value is \"{value}\".");
 
             if (state.Options.ProcessLatex) {
-                value = LatexConverter.ConvertBracedParts(value);
+                value = LatexConverter.ConvertFrom(value);
                 Debug.WriteLine($"Field value is \"{value}\".");
             }
 

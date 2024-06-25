@@ -15,6 +15,7 @@ namespace Visus.BibTex {
     /// Lexer for LaTex tokens.
     /// </summary>
     /// <param name="input">The input to be processed.</param>
+    [DebuggerDisplay("{_input}")]
     internal ref struct LatexTokeniser(ReadOnlySpan<char> input) {
 
         #region Public methods
@@ -55,6 +56,7 @@ namespace Visus.BibTex {
             '}' => LatexTokenType.BraceRight,
             '$' => LatexTokenType.Dollar,
             '-' => LatexTokenType.Hyphen,
+            '~' => LatexTokenType.Tilde,
             _ => char.IsWhiteSpace(c)
                 ? LatexTokenType.WhiteSpace
                 : LatexTokenType.Literal
