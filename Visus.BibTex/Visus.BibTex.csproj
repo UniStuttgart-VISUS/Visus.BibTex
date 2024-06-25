@@ -5,7 +5,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Title>VISUS BibTex</Title>
-    <Version>0.0.1-alpha</Version>
+    <Version>0.0.2-alpha</Version>
     <Authors>Christoph Müller</Authors>
     <Company>Visualisierungsinstitut der Universität Stuttgart</Company>
     <Description>A library for parsing an manipulating BibTex entries.</Description>
@@ -18,7 +18,7 @@
     <PackageReleaseNotes>Initial version of the library.</PackageReleaseNotes>
     <NeutralLanguage>en</NeutralLanguage>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <IncludeSymbols>True</IncludeSymbols>
+    <IncludeSymbols>False</IncludeSymbols>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 

@@ -4,18 +4,9 @@
 // </copyright>
 // <author>Christoph Müller</author>
 
-using Microsoft.VisualBasic;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using System;
-using System.Diagnostics.Metrics;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Reflection;
-using System.Runtime.ConstrainedExecution;
-using System.Runtime.Intrinsics.X86;
-using System.Security.Cryptography;
-using static System.Collections.Specialized.BitVector32;
 
 
 namespace Visus.BibTex.Test {
