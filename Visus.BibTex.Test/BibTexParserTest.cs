@@ -531,6 +531,20 @@ Evolution of {Neotropical} cricetine rodents
             Assert.IsTrue(items.Any(i => i.Key == "Parker_OptiX_2010"));
             Assert.IsTrue(items.Any(i => i.Key == "Sinha2022NotAllGPUs"));
 
+            {
+                var item = items.Where(i => i.Key == "Isenberg:2017:VMC").Single();
+                Assert.AreEqual("vispubdata.org: A Metadata Collection about IEEE Visualization (VIS) Publications", item.Title);
+            }
+
+            {
+                var item = items.Where(i => i.Key == "Kindlmann:1999:SAG").Single();
+                Assert.AreEqual("Semi-Automatic Generation of Transfer Functions for Direct Volume Rendering", item.Title);
+            }
+
+            {
+                var item = items.Where(i => i.Key == "Nielson:1991:TAD").Single();
+                Assert.AreEqual("Proc. Visualization", item.BookTitle);
+            }
         }
     }
 }
