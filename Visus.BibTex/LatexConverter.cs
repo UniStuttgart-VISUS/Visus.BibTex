@@ -5,8 +5,6 @@
 // <author>Christoph Müller</author>
 
 using System;
-using System.Diagnostics;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Unicode;
@@ -25,10 +23,13 @@ namespace Visus.BibTex {
         /// keeps all other text.
         /// </summary>
         /// <param name="text">The text to be converted.</param>
+        /// <param name="options">A <see cref="LatexConverterOptions"/>
+        /// customising the behaviour of the method.</param>
         /// <returns>The text which has as many Latex commands within braced
         /// ranges replaced with matching Unicode characters as possible.
         /// </returns>
-        public static string ConvertBracedParts(ReadOnlySpan<char> text) {
+        public static string ConvertBracedParts(ReadOnlySpan<char> text,
+                LatexConverterOptions options) {
             var retval = new StringBuilder();
             var tokeniser = new LatexTokeniser(text);
 
@@ -39,7 +40,7 @@ namespace Visus.BibTex {
                     case LatexTokenType.BraceLeft:
                         // If we find an opening brace, we are in Latex mode and
                         // hand over to the appropriate method.
-                        ParseLatex(ref tokeniser, retval, true);
+                        ParseLatex(ref tokeniser, retval, options, true);
                         break;
 
                     case LatexTokenType.End:
@@ -59,6 +60,34 @@ namespace Visus.BibTex {
         }
 
         /// <summary>
+        /// Converts braced parts in <paramref name="text"/> from LaTex, but
+        /// keeps all other text.
+        /// </summary>
+        /// <param name="text">The text to be converted.</param>
+        /// <returns>The text which has as many Latex commands within braced
+        /// ranges replaced with matching Unicode characters as possible.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string ConvertBracedParts(ReadOnlySpan<char> text)
+            => ConvertBracedParts(text, LatexConverterOptions.Default);
+
+        /// <summary>
+        /// Converts from LaTex to plain text.
+        /// </summary>
+        /// <param name="text">The text to be converted.</param>
+        /// <param name="options">A <see cref="LatexConverterOptions"/>
+        /// customising the behaviour of the method.</param>
+        /// <returns>The text which has as many Latex commands replaced with
+        /// matching Unicode characters as possible.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string ConvertFrom(ReadOnlySpan<char> text,
+                LatexConverterOptions options) {
+            var tokeniser = new LatexTokeniser(text);
+            var retval = ParseLatex(ref tokeniser, new(), options, false);
+            return retval.ToString().Normalize();
+        }
+
+        /// <summary>
         /// Converts from LaTex to plain text.
         /// </summary>
         /// <param name="text">The text to be converted.</param>
@@ -67,7 +96,8 @@ namespace Visus.BibTex {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ConvertFrom(ReadOnlySpan<char> text) {
             var tokeniser = new LatexTokeniser(text);
-            var retval = ParseLatex(ref tokeniser, new(), false);
+            var retval = ParseLatex(ref tokeniser, new(),
+                LatexConverterOptions.Default, false);
             return retval.ToString().Normalize();
         }
 
@@ -133,6 +163,7 @@ namespace Visus.BibTex {
         /// input and convert it to Unicode text to the extent possible.
         /// </summary>
         /// <param name="tokeniser"></param>
+        /// <param name="options"></param>
         /// <param name="retval"></param>
         /// <param name="stopAtBrace">If <c>true</c>, stop parsing if the last
         /// (non-matching) closing brace was found. This brace will be consumed
@@ -141,7 +172,9 @@ namespace Visus.BibTex {
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
         private static StringBuilder ParseLatex(ref LatexTokeniser tokeniser,
-                StringBuilder retval, bool stopAtBrace) {
+                StringBuilder retval,
+                LatexConverterOptions options,
+                bool stopAtBrace) {
             var braces = 0;
             var command = false;
             var diacritic = (Diacritic?) null;
@@ -403,14 +436,14 @@ namespace Visus.BibTex {
             //new("widehat", '\u'),
             new("check", '\u030C'),
             new("tilde", '\u0303'),
-            //new("widetilde", '\u'),
+            new("widetilde", '\u0360'),
             new("acute", '\u0301'),
             new("grave", '\u0300'),
             new("dot", '\u0307'),
             new("ddot", '\u0308'),
             new("breve", '\u0306'),
             new("bar", '\u0304'),
-            //new("vec", '\u'),
+            new("vec", '\u0305'),
         ];
 
         private static readonly Diacritic[] TextDiacritics = [
